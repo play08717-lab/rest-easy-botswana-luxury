@@ -333,6 +333,18 @@ export const getPublicSettings = createServerFn({ method: "GET" }).handler(async
   return data;
 });
 
+// ---------------- Admin: full settings ----------------
+export const getAdminSettings = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { data, error } = await supabase.from("settings").select("*").eq("id", 1).maybeSingle();
+    if (error) throw new Error(error.message);
+    return data;
+  });
+
 // ---------------- Admin: block dates ----------------
 export const blockDates = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
