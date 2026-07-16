@@ -131,7 +131,7 @@ function BookPage() {
           {!user ? (
             <div className="bg-paper text-dark p-8">
               <p className="text-sm">Please sign in to complete your reservation.</p>
-              <Link to="/auth" search={{ redirect: "/book" }} className="mt-4 inline-block bg-dark text-paper px-6 py-3 text-[11px] uppercase tracking-[0.2em]">
+              <Link to="/auth" search={{ next: "/book" }} className="mt-4 inline-block bg-dark text-paper px-6 py-3 text-[11px] uppercase tracking-[0.2em]">
                 Sign in or create account
               </Link>
             </div>
