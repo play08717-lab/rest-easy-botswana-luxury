@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
+import { useSession, useIsAdmin } from "@/hooks/use-session";
+import { supabase } from "@/integrations/supabase/client";
 
 const links = [
   { to: "/", label: "Home" },
@@ -9,6 +11,7 @@ const links = [
   { to: "/why-choose-us", label: "Why Choose Us" },
   { to: "/gallery", label: "Gallery" },
   { to: "/nearby", label: "Nearby" },
+  { to: "/faq", label: "FAQ" },
   { to: "/contact", label: "Contact" },
   { to: "/book", label: "Book Now" },
 ] as const;
@@ -18,6 +21,8 @@ const WHATSAPP_URL = "https://wa.me/26771621866";
 export function SidebarNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
+  const { user } = useSession();
+  const isAdmin = useIsAdmin();
 
   return (
     <>
@@ -82,7 +87,20 @@ export function SidebarNav() {
           })}
         </ul>
 
-        <div className="px-10">
+        <div className="px-10 space-y-4">
+          <div className="flex flex-col gap-2 text-[11px] uppercase tracking-[0.2em]">
+            {user ? (
+              <>
+                <Link to="/account" onClick={() => setOpen(false)} className="text-paper/60 hover:text-gold">My bookings</Link>
+                {isAdmin && (
+                  <Link to="/admin" onClick={() => setOpen(false)} className="text-paper/60 hover:text-gold">Admin</Link>
+                )}
+                <button onClick={() => supabase.auth.signOut()} className="text-left text-paper/40 hover:text-gold">Sign out</button>
+              </>
+            ) : (
+              <Link to="/auth" onClick={() => setOpen(false)} className="text-paper/60 hover:text-gold">Sign in</Link>
+            )}
+          </div>
           <a
             href={WHATSAPP_URL}
             target="_blank"
@@ -93,7 +111,7 @@ export function SidebarNav() {
               Book via WhatsApp
             </span>
           </a>
-          <p className="text-[10px] text-paper/40 mt-4 text-center tracking-widest">
+          <p className="text-[10px] text-paper/40 text-center tracking-widest">
             +267 71 621 866
           </p>
         </div>
