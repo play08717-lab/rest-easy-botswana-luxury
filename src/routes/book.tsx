@@ -21,7 +21,7 @@ type AvailRow = { apartment_id: string; slug: string; name: string; description:
 
 function BookPage() {
   const navigate = useNavigate();
-  const { session } = useSession();
+  const { user } = useSession();
   const search = useServerFn(searchAvailability);
   const create = useServerFn(createBooking);
 
