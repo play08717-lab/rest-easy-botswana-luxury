@@ -128,7 +128,7 @@ function BookPage() {
       {selected && (
         <section className="mt-12 border-t border-gold/15 pt-10">
           <h2 className="font-display text-2xl mb-6">Your details</h2>
-          {!session ? (
+          {!user ? (
             <div className="bg-paper text-dark p-8">
               <p className="text-sm">Please sign in to complete your reservation.</p>
               <Link to="/auth" search={{ redirect: "/book" }} className="mt-4 inline-block bg-dark text-paper px-6 py-3 text-[11px] uppercase tracking-[0.2em]">
