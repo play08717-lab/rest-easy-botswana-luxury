@@ -1,59 +1,112 @@
+## Rest Easy Apartment — Phase 1 build plan
 
-## Rest Easy Apartment — full site build plan
+Extending the existing "Dashboard bento" site into a working booking platform for a single property. Public site stays as-is visually; we add real availability, bookings, guest accounts, admin, and manual-payment reconciliation.
 
-Building on the selected "Dashboard bento" direction: black canvas, warm paper surfaces, gold accents, Playfair Display headings + Poppins body, fixed left sidebar nav, bento grids, slow reveal animations, persistent WhatsApp CTA.
+### Locked decisions (from your answers)
+- **Scope**: Public site + online booking + guest portal + admin dashboard
+- **Payments**: Manual bank transfer / EFT — guest gets bank details + reference; admin marks paid
+- **Currency**: BWP (P), rates from P400–P650 (per unit, editable in admin)
+- **Notifications**: Email (Lovable Cloud) + WhatsApp auto-messages (WhatsApp Business API)
+- **Housekeeping, staff roles, promo codes, reports, restaurant/car/tours, loyalty** → phase 2 (schema designed to support them)
 
-### Design tokens (locked, ported into `src/styles.css`)
-- `--dark: #0a0a0a`, `--paper: #f7f4ee`, `--gold: #c9a24c`, `--gold-light: #e8c87a`, `--whatsapp: #25D366`
-- Fonts loaded via `<link>` in `__root.tsx`: Playfair Display + Poppins
-- `--font-display: Playfair Display`, `--font-body: Poppins`
-- Reveal keyframe utility (`animate-reveal`) with staggered delays
+### Prerequisites we'll set up
+1. **Lovable Cloud** — needed for auth, database, email, storage of PDFs.
+2. **Email domain** — you'll need a domain you own so guests receive branded email from e.g. `bookings@yourdomain`. Without one, we fall back to a Lovable-owned sender for auth emails only and booking emails won't send.
+3. **WhatsApp Business API** — requires Meta Business verification + a BSP (e.g. Twilio/360dialog) and pre-approved message templates. This can take days-to-weeks. Until approved, WhatsApp confirmations degrade to a one-click "Send via WhatsApp" link opened on the admin's phone.
 
-### Routes (each with its own `head()` meta — title, description, og:title, og:description)
-```
-src/routes/
-  __root.tsx           shared shell: <SidebarNav/> + <Outlet/> + <FloatingWhatsApp/>
-  index.tsx            Home (hero bento + About teaser + Apartments preview + Gallery preview + Why Choose + Location)
-  about.tsx            About — story, values, hosts
-  apartments.tsx       Apartments — full list of units with pricing placeholders
-  why-choose-us.tsx    Why Choose Us — feature grid
-  gallery.tsx          Gallery — masonry bento grid
-  nearby.tsx           Nearby Attractions — Boteti / Makgadikgadi / Central Kalahari
-  contact.tsx          Contact — phone, WhatsApp, address, embedded map
-  book.tsx             Book Now — request form + WhatsApp CTA
-```
+### Public website changes
+- Add **FAQ** route (currently missing).
+- Home & Apartments: real "Check availability" widget (dates + guests) → routes to `/book`.
+- **Book Now** flow becomes a real multi-step booking (see below), replacing the current WhatsApp-only form.
+- Keep sidebar nav, WhatsApp float, Rakops map, existing gallery.
 
-### Shared components (`src/components/`)
-- `SidebarNav.tsx` — fixed left sidebar (72px mobile / 288px desktop), REST EASY wordmark, Rakops caption, nav links using `<Link>` with active state via `useRouterState`, Book via WhatsApp button anchored at bottom
-- `FloatingWhatsApp.tsx` — bottom-right pill linking to `https://wa.me/26771621866`
-- `BentoCard.tsx` — reusable dark/paper card with optional image + overlay
-- `ApartmentCard.tsx` — image + name + short blurb + "from" price + View Details
-- `SectionHeading.tsx` — gold eyebrow + Playfair heading
-- `GoogleMap.tsx` — iframe embed of Rakops, Botswana (Google Maps standard embed URL, no API key needed)
-- `Footer.tsx` — subtle border-top, copyright + legal links
+### Booking flow (guest)
+1. **Search** — pick check-in / check-out / guests → shows only apartments free for the whole range with total price.
+2. **Select unit** → booking summary (nights × rate, taxes if any, total in BWP).
+3. **Guest details** — name, email, phone, ID/passport, special requests. Guest signs in or signs up (email + password; magic-link fallback).
+4. **Confirm & reserve** — creates booking in `pending_payment` status, holds the dates for 24h.
+5. **Payment instructions page** — shows bank details, booking reference (e.g. `RE-2026-000123`), amount, and a "I've paid" button that lets the guest upload proof of payment (optional).
+6. **Confirmation page** with downloadable PDF voucher + invoice.
 
-### Page content specifics
-- **Home** mirrors selected prototype's bento exactly: hero (8-col) + Essence (4-col) + 3 apartment/gallery tiles + full-width Location. Adds a Why Choose Us row before Location.
-- **Apartments**: 3 units — Executive Studio, Master Apartment, Garden Suite — with generic self-catering descriptions (private entrance, en-suite, kitchenette, secure parking). Price shown as "From P—" placeholder.
-- **Gallery**: 8–10 placeholder tiles in bento layout (varied col/row spans).
-- **Nearby Attractions**: cards for Makgadikgadi Pans, Boteti River, Central Kalahari Game Reserve — generic distances noted as "approximate".
-- **Contact**: phone `+267 71 621 866`, WhatsApp same, address `Plot 2903, Rakops, Botswana`, embedded Google map iframe.
-- **Book Now**: simple request form (name, dates, guests, message) that composes a `wa.me` deep link — no backend needed.
+### Automated messages (fires on state change)
+| Trigger | Email | WhatsApp |
+|---|---|---|
+| Booking created (pending payment) | Payment instructions + reference + voucher | Same, short |
+| Admin marks paid | Confirmation + invoice PDF | Confirmation |
+| 24h before check-in | Reminder + directions | Reminder |
+| Check-in day | Welcome + WiFi/keys note (owner-editable) | Welcome |
+| Check-out day | Check-out reminder | Reminder |
+| Day after check-out | Thank-you + review request | Thank-you |
 
-### Guardrails
-- No claims about pool, spa, restaurant, gym, Wi-Fi speed, breakfast, etc. Features stay generic: self-catering, secure gated parking, quiet location, warm hospitality.
-- All imagery uses `data-lov-image-placeholder` blocks generated at build time via the imagegen tool, saved to `src/assets/`, imported as ES6 modules.
-- Mobile-first: sidebar collapses to icon strip on `<lg`; bento grids collapse to single column on mobile.
-- Root `head()` sets sitewide defaults; each leaf overrides title/description/og.
+### Guest portal (`/account`)
+- My bookings (upcoming / past)
+- Download voucher + invoice PDFs
+- Cancel booking (if >48h before check-in, configurable)
+- Message reception (creates admin inbox thread)
 
-### Technical notes
-- No backend / Lovable Cloud needed — booking flows through WhatsApp deep links.
-- Google Map uses standard `https://www.google.com/maps?q=...&output=embed` iframe (no API key).
-- All navigation uses `@tanstack/react-router` `<Link>`; no `<a href>` for internal routes.
+### Admin dashboard (`/admin`, role-gated)
+- **Overview**: today's check-ins/check-outs, occupancy %, revenue this month, pending-payment bookings needing action.
+- **Calendar** (month view, per unit): drag to block dates for maintenance; color-coded by status.
+- **Bookings list**: filter by status/date/unit; open a booking → mark paid, cancel, refund note, resend email, regenerate PDFs.
+- **Apartments**: edit name, description, images, base rate, max guests, active flag.
+- **Guests**: searchable list, booking history per guest.
+- **Payments**: bookings awaiting payment, mark paid (with amount + method note), see uploaded proof.
+- **Blocked dates**: maintenance holds per unit with reason.
+- **Settings**: bank details, cancellation window, check-in/out times, contact info, message templates.
 
-### Build order
-1. Update `src/styles.css` with tokens + fonts + `animate-reveal` utility
-2. Update `__root.tsx` with font `<link>` tags, sidebar shell, floating WhatsApp, sitewide meta
-3. Generate ~10 placeholder images in parallel to `src/assets/`
-4. Create shared components
-5. Create all 8 route files with per-route `head()` and content
+### Roles (phase 1)
+- **Guest** — default on signup, sees own portal only.
+- **Admin** — full access.
+- Roles table + `has_role()` security-definer function so we can add Receptionist / Housekeeping / Manager in phase 2 without refactor.
+
+### Data model (Lovable Cloud tables, all with RLS)
+- `profiles` (id → auth.users, full_name, phone, id_number, avatar)
+- `user_roles` (user_id, role enum: guest/admin) — never on profiles
+- `apartments` (id, slug, name, description, base_rate_bwp, max_guests, images[], active)
+- `bookings` (id, reference, apartment_id, guest_id, check_in, check_out, guests, total_bwp, status enum: pending_payment/confirmed/cancelled/checked_in/checked_out/no_show, special_requests, created_at)
+- `payments` (id, booking_id, amount_bwp, method, reference, proof_url, recorded_by, recorded_at)
+- `blocked_dates` (id, apartment_id, start_date, end_date, reason)
+- `messages` (id, booking_id, sender enum: guest/admin, body, created_at) — for the reception thread
+- `notification_log` (id, booking_id, channel, template, status, sent_at) — audit trail
+- `settings` (singleton key-value: bank details, cancellation hours, check-in/out times, message templates)
+
+### Server-side logic (TanStack server functions + `/api/public/*` webhooks)
+- `searchAvailability({ check_in, check_out, guests })` — public, returns free units + total.
+- `createBooking(...)` — auth required (guest); computes total server-side, checks conflict + blocked dates transactionally, generates reference, enqueues emails.
+- `cancelBooking(id)` — guest (own, within window) or admin.
+- `markPaid(bookingId, amount, method)` — admin only, transitions to `confirmed`, triggers confirmation email + voucher.
+- `generateVoucherPdf(bookingId)` / `generateInvoicePdf(bookingId)` — server-rendered PDFs stored in Cloud Storage, signed URL returned.
+- `sendNotification(bookingId, template)` — dispatches email via Lovable Cloud email + WhatsApp via BSP if configured, logs to `notification_log`.
+- **Reminder scheduler** — a `/api/public/cron/reminders` endpoint hit by pg_cron every hour to send check-in/out reminders and thank-you messages.
+
+### Security
+- RLS everywhere; guests read/write only their own bookings/payments/messages.
+- Admin routes gated by `_authenticated` layout + `has_role('admin')` check in `beforeLoad` of `/admin` subtree.
+- Bank details + settings readable only by admin (RLS).
+- Activity log table for admin actions (`booking_confirmed`, `booking_cancelled`, `settings_changed`) — foundation for phase-2 audit view.
+- Automatic backups: rely on Lovable Cloud managed Postgres backups (no app-side work needed).
+
+### Phase 2 hooks (designed in, not built)
+- Roles enum already supports `receptionist`, `housekeeping`, `manager`.
+- Apartments table has a nullable `property_id` (future multi-property).
+- `bookings.type` field ready for `stay | tour | transfer | rental`.
+- `promo_codes` and `loyalty_points` tables not created yet but the pricing function is centralized so it can call them.
+
+### Build order (roughly one large step per bullet)
+1. Enable Lovable Cloud → create schema, roles, RLS policies, seed 3 apartments with your P400–P650 rates + settings row.
+2. Auth pages (`/auth` sign-in/up), guest profile bootstrap, root session listener.
+3. Public availability search + booking flow (steps 1–4) writing real bookings.
+4. Payment instructions page + guest voucher/invoice PDFs + email sends.
+5. Guest portal (`/account`).
+6. Admin dashboard shell + overview + bookings + calendar + mark-paid + apartments + settings.
+7. Reminder cron + WhatsApp integration (or WhatsApp deep-link fallback if BSP not ready).
+8. FAQ page + polish.
+
+### What we'll need from you along the way
+- **Email domain** (or approval to buy one) — for sending confirmations.
+- **Bank details** to display on the payment instructions page (account name, bank, account #, branch, reference format). Can be placeholders now, edited in admin later.
+- **Confirmed rates** per unit (Executive / Master / Garden) within the P400–P650 range.
+- **First admin email** — we'll grant admin to that account on first sign-up.
+- **WhatsApp Business API access** (Meta Business + BSP account) when you're ready; not blocking phase-1 launch.
+
+Approve this and I'll start with step 1 (Cloud + schema + auth).
