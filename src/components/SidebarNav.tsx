@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
+import { useSession, useIsAdmin } from "@/hooks/use-session";
+import { supabase } from "@/integrations/supabase/client";
 
 const links = [
   { to: "/", label: "Home" },
@@ -9,6 +11,7 @@ const links = [
   { to: "/why-choose-us", label: "Why Choose Us" },
   { to: "/gallery", label: "Gallery" },
   { to: "/nearby", label: "Nearby" },
+  { to: "/faq", label: "FAQ" },
   { to: "/contact", label: "Contact" },
   { to: "/book", label: "Book Now" },
 ] as const;
