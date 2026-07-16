@@ -1,213 +1,176 @@
-import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { searchAvailability, createBooking } from "@/lib/booking.functions";
+import { useSession } from "@/hooks/use-session";
 import { PageHero } from "@/components/PageHero";
-import { apartments } from "@/data/apartments";
-import { ArrowUpRight } from "lucide-react";
 
 export const Route = createFileRoute("/book")({
   head: () => ({
     meta: [
       { title: "Book Now — Rest Easy Apartment, Rakops" },
-      {
-        name: "description",
-        content:
-          "Reserve your stay at Rest Easy Apartment. Send a WhatsApp booking request in one tap.",
-      },
-      { property: "og:title", content: "Book Now — Rest Easy Apartment" },
-      {
-        property: "og:description",
-        content:
-          "Send a booking request on WhatsApp — we confirm within the day.",
-      },
-      { property: "og:url", content: "/book" },
+      { name: "description", content: "Check availability and reserve your stay at Rest Easy Apartment in Rakops, Botswana." },
+      { property: "og:title", content: "Book Rest Easy Apartment" },
+      { property: "og:description", content: "Check availability and reserve online." },
     ],
-    links: [{ rel: "canonical", href: "/book" }],
   }),
-  component: Book,
+  component: BookPage,
 });
 
-function Book() {
-  const [form, setForm] = useState({
-    name: "",
-    apartment: apartments[0].name,
-    checkIn: "",
-    checkOut: "",
-    guests: "2",
-    notes: "",
-  });
+type AvailRow = { apartment_id: string; slug: string; name: string; description: string; base_rate_bwp: number; max_guests: number; nights: number; total_bwp: number };
 
-  const whatsappUrl = useMemo(() => {
-    const msg = [
-      `Hello Rest Easy Apartment,`,
-      ``,
-      `I'd like to enquire about a stay:`,
-      `• Name: ${form.name || "—"}`,
-      `• Apartment: ${form.apartment}`,
-      `• Check-in: ${form.checkIn || "—"}`,
-      `• Check-out: ${form.checkOut || "—"}`,
-      `• Guests: ${form.guests}`,
-      form.notes ? `• Notes: ${form.notes}` : "",
-      ``,
-      `Thank you.`,
-    ]
-      .filter(Boolean)
-      .join("\n");
-    return `https://wa.me/26771621866?text=${encodeURIComponent(msg)}`;
-  }, [form]);
+function BookPage() {
+  const navigate = useNavigate();
+  const { session } = useSession();
+  const search = useServerFn(searchAvailability);
+  const create = useServerFn(createBooking);
+
+  const today = new Date().toISOString().slice(0, 10);
+  const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
+
+  const [checkIn, setCheckIn] = useState(today);
+  const [checkOut, setCheckOut] = useState(tomorrow);
+  const [guests, setGuests] = useState(2);
+  const [results, setResults] = useState<AvailRow[] | null>(null);
+  const [searching, setSearching] = useState(false);
+  const [selected, setSelected] = useState<AvailRow | null>(null);
+  const [err, setErr] = useState("");
+
+  const [guestName, setGuestName] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
+  const [guestPhone, setGuestPhone] = useState("");
+  const [requests, setRequests] = useState("");
+  const [booking, setBooking] = useState(false);
+
+  const runSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr(""); setResults(null); setSelected(null); setSearching(true);
+    try {
+      const rows = await search({ data: { check_in: checkIn, check_out: checkOut, guests } });
+      setResults(rows as AvailRow[]);
+    } catch (e) { setErr(e instanceof Error ? e.message : "Search failed"); }
+    setSearching(false);
+  };
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selected) return;
+    setErr(""); setBooking(true);
+    try {
+      const b = await create({
+        data: {
+          apartment_id: selected.apartment_id,
+          check_in: checkIn, check_out: checkOut, guests,
+          guest_name: guestName, guest_email: guestEmail, guest_phone: guestPhone,
+          special_requests: requests || null,
+        },
+      });
+      navigate({ to: "/account/$bookingId", params: { bookingId: b.id } });
+    } catch (e) { setErr(e instanceof Error ? e.message : "Booking failed"); }
+    setBooking(false);
+  };
 
   return (
     <>
       <PageHero
-        eyebrow="Reserve"
-        title={<>Send a request. <span className="italic text-gold-light">We'll take it from there.</span></>}
-        intro="Fill in your details below — we'll open WhatsApp with your enquiry pre-filled. It's the quickest way to check availability."
+        eyebrow="Book Now"
+        title={<>Reserve <em className="text-gold-light">your stay</em></>}
+        intro="Check availability, choose your unit, and secure the room. You'll receive bank details for a manual EFT after submitting."
       />
 
-      <section className="grid lg:grid-cols-5 gap-6 md:gap-8 mt-10">
-        <form
-          className="lg:col-span-3 bg-paper text-dark p-8 md:p-10 space-y-6"
-          onSubmit={(e) => {
-            e.preventDefault();
-            window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-          }}
-        >
-          <Field
-            label="Your name"
-            value={form.name}
-            onChange={(v) => setForm({ ...form, name: v })}
-            placeholder="Full name"
-            required
-          />
+      <form onSubmit={runSearch} className="mt-10 grid md:grid-cols-4 gap-4 bg-paper/5 backdrop-blur-md border border-gold/20 p-6">
+        <Field label="Check-in">
+          <input type="date" required min={today} value={checkIn} onChange={(e) => setCheckIn(e.target.value)}
+            className="w-full bg-transparent border-b border-gold/30 py-2 text-paper" />
+        </Field>
+        <Field label="Check-out">
+          <input type="date" required min={checkIn} value={checkOut} onChange={(e) => setCheckOut(e.target.value)}
+            className="w-full bg-transparent border-b border-gold/30 py-2 text-paper" />
+        </Field>
+        <Field label="Guests">
+          <input type="number" min={1} max={10} value={guests} onChange={(e) => setGuests(Number(e.target.value))}
+            className="w-full bg-transparent border-b border-gold/30 py-2 text-paper" />
+        </Field>
+        <button disabled={searching} className="bg-gold text-dark px-6 py-3 text-[11px] uppercase tracking-[0.2em] font-semibold self-end disabled:opacity-50">
+          {searching ? "Searching…" : "Check availability"}
+        </button>
+      </form>
 
-          <div>
-            <label className="text-[10px] uppercase tracking-[0.3em] text-dark/50 block mb-2">
-              Apartment
-            </label>
-            <select
-              value={form.apartment}
-              onChange={(e) => setForm({ ...form, apartment: e.target.value })}
-              className="w-full bg-transparent border-b border-dark/20 focus:border-gold outline-none py-3 text-base"
-            >
-              {apartments.map((a) => (
-                <option key={a.slug} value={a.name}>
-                  {a.name}
-                </option>
-              ))}
-              <option value="Any / help me decide">Any / help me decide</option>
-            </select>
+      {err && <p className="mt-6 text-red-400 text-sm">{err}</p>}
+
+      {results && (
+        <section className="mt-10">
+          <h2 className="text-[10px] uppercase tracking-[0.3em] text-gold mb-4">
+            {results.length} apartment{results.length === 1 ? "" : "s"} available
+          </h2>
+          {results.length === 0 && <p className="text-paper/60 text-sm">Sorry, nothing available for those dates. Try different dates.</p>}
+          <div className="grid md:grid-cols-3 gap-4">
+            {results.map((r) => {
+              const active = selected?.apartment_id === r.apartment_id;
+              return (
+                <button
+                  key={r.apartment_id}
+                  onClick={() => setSelected(r)}
+                  type="button"
+                  className={`text-left p-6 border transition-all ${active ? "border-gold bg-gold/10" : "border-gold/15 hover:border-gold/40"}`}
+                >
+                  <h3 className="font-display text-xl">{r.name}</h3>
+                  <p className="text-xs text-paper/60 mt-2">Up to {r.max_guests} guests · P{Number(r.base_rate_bwp).toFixed(0)}/night</p>
+                  <p className="mt-4 font-display text-2xl text-gold-light">P{Number(r.total_bwp).toFixed(2)}</p>
+                  <p className="text-[10px] uppercase tracking-widest text-paper/40 mt-1">{r.nights} night{r.nights === 1 ? "" : "s"} total</p>
+                </button>
+              );
+            })}
           </div>
+        </section>
+      )}
 
-          <div className="grid sm:grid-cols-2 gap-6">
-            <Field
-              label="Check-in"
-              type="date"
-              value={form.checkIn}
-              onChange={(v) => setForm({ ...form, checkIn: v })}
-            />
-            <Field
-              label="Check-out"
-              type="date"
-              value={form.checkOut}
-              onChange={(v) => setForm({ ...form, checkOut: v })}
-            />
-          </div>
-
-          <Field
-            label="Guests"
-            type="number"
-            value={form.guests}
-            onChange={(v) => setForm({ ...form, guests: v })}
-          />
-
-          <div>
-            <label className="text-[10px] uppercase tracking-[0.3em] text-dark/50 block mb-2">
-              Notes (optional)
-            </label>
-            <textarea
-              value={form.notes}
-              onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              rows={3}
-              placeholder="Arrival time, special requests…"
-              className="w-full bg-transparent border-b border-dark/20 focus:border-gold outline-none py-3 text-base resize-none"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full sm:w-auto inline-flex items-center gap-3 bg-dark text-paper px-8 py-4 text-[11px] uppercase tracking-[0.2em] font-semibold hover:bg-gold hover:text-dark transition-colors"
-          >
-            Send on WhatsApp
-            <ArrowUpRight className="w-4 h-4" />
-          </button>
-          <p className="text-xs text-dark/50">
-            No booking is confirmed until we reply. You can also call +267 71 621 866.
-          </p>
-        </form>
-
-        <aside className="lg:col-span-2 bg-dark border border-gold/15 p-8 md:p-10 flex flex-col justify-between">
-          <div>
-            <span className="text-[10px] uppercase tracking-[0.35em] text-gold font-semibold">
-              How booking works
-            </span>
-            <h2 className="font-display text-3xl mt-5 leading-[1.05]">
-              Simple, and personal.
-            </h2>
-            <ol className="mt-8 space-y-6">
-              {[
-                "Send us your dates and preferred apartment.",
-                "We reply on WhatsApp with availability and rate.",
-                "You confirm — and we'll be ready for your arrival.",
-              ].map((t, i) => (
-                <li key={t} className="flex gap-5">
-                  <span className="text-gold font-display text-lg leading-none pt-1">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <p className="text-sm text-paper/70 leading-relaxed">{t}</p>
-                </li>
-              ))}
-            </ol>
-          </div>
-          <div className="mt-10 pt-8 border-t border-gold/15">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-gold">Direct line</p>
-            <p className="text-lg mt-2">+267 71 621 866</p>
-            <p className="text-sm text-paper/50 mt-4">
-              Plot 2903, Rakops, Botswana
-            </p>
-          </div>
-        </aside>
-      </section>
+      {selected && (
+        <section className="mt-12 border-t border-gold/15 pt-10">
+          <h2 className="font-display text-2xl mb-6">Your details</h2>
+          {!session ? (
+            <div className="bg-paper text-dark p-8">
+              <p className="text-sm">Please sign in to complete your reservation.</p>
+              <Link to="/auth" search={{ redirect: "/book" }} className="mt-4 inline-block bg-dark text-paper px-6 py-3 text-[11px] uppercase tracking-[0.2em]">
+                Sign in or create account
+              </Link>
+            </div>
+          ) : (
+            <form onSubmit={submit} className="grid md:grid-cols-2 gap-4 max-w-3xl">
+              <Field label="Full name">
+                <input required value={guestName} onChange={(e) => setGuestName(e.target.value)} className="w-full bg-transparent border-b border-gold/30 py-2 text-paper" />
+              </Field>
+              <Field label="Email">
+                <input required type="email" value={guestEmail} onChange={(e) => setGuestEmail(e.target.value)} className="w-full bg-transparent border-b border-gold/30 py-2 text-paper" />
+              </Field>
+              <Field label="Phone">
+                <input required value={guestPhone} onChange={(e) => setGuestPhone(e.target.value)} className="w-full bg-transparent border-b border-gold/30 py-2 text-paper" />
+              </Field>
+              <Field label="Special requests (optional)">
+                <input value={requests} onChange={(e) => setRequests(e.target.value)} className="w-full bg-transparent border-b border-gold/30 py-2 text-paper" />
+              </Field>
+              <div className="md:col-span-2 flex items-center justify-between border-t border-gold/10 pt-6 mt-4">
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-paper/50">Total to pay</p>
+                  <p className="font-display text-3xl text-gold-light">P{Number(selected.total_bwp).toFixed(2)}</p>
+                </div>
+                <button disabled={booking} className="bg-gold text-dark px-8 py-4 text-[11px] uppercase tracking-[0.2em] font-semibold disabled:opacity-50">
+                  {booking ? "Reserving…" : "Reserve"}
+                </button>
+              </div>
+            </form>
+          )}
+        </section>
+      )}
     </>
   );
 }
 
-function Field({
-  label,
-  value,
-  onChange,
-  type = "text",
-  placeholder,
-  required,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  type?: string;
-  placeholder?: string;
-  required?: boolean;
-}) {
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div>
-      <label className="text-[10px] uppercase tracking-[0.3em] text-dark/50 block mb-2">
-        {label}
-      </label>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        required={required}
-        className="w-full bg-transparent border-b border-dark/20 focus:border-gold outline-none py-3 text-base"
-      />
-    </div>
+    <label className="block">
+      <span className="text-[10px] uppercase tracking-[0.3em] text-paper/60">{label}</span>
+      <div className="mt-2">{children}</div>
+    </label>
   );
 }
