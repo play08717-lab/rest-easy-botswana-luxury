@@ -21,6 +21,8 @@ const WHATSAPP_URL = "https://wa.me/26771621866";
 export function SidebarNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
+  const { user } = useSession();
+  const isAdmin = useIsAdmin();
 
   return (
     <>
