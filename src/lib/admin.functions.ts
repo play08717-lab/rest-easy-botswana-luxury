@@ -4,10 +4,18 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const dateStr = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
-async function assertAdmin(ctx: { supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: boolean | null }> }; userId: string }) {
+type AuthCtx = {
+  supabase: {
+    rpc: (fn: "has_role", args: { _user_id: string; _role: "admin" }) => Promise<{ data: boolean | null }>;
+  };
+  userId: string;
+};
+
+async function assertAdmin(ctx: AuthCtx) {
   const { data } = await ctx.supabase.rpc("has_role", { _user_id: ctx.userId, _role: "admin" });
   if (!data) throw new Error("Forbidden");
 }
+
 
 // ---------------- KPI dashboard ----------------
 export const getManagerKpis = createServerFn({ method: "GET" })
