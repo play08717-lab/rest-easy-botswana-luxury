@@ -4,25 +4,14 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const dateStr = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
-type AuthCtx = {
-  supabase: {
-    rpc: (fn: "has_role", args: { _user_id: string; _role: "admin" }) => Promise<{ data: boolean | null }>;
-  };
-  userId: string;
-};
-
-async function assertAdmin(ctx: AuthCtx) {
-  const { data } = await ctx.supabase.rpc("has_role", { _user_id: ctx.userId, _role: "admin" });
-  if (!data) throw new Error("Forbidden");
-}
-
-
 // ---------------- KPI dashboard ----------------
 export const getManagerKpis = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await assertAdmin(context);
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+
     const today = new Date().toISOString().slice(0, 10);
     const monthStart = today.slice(0, 8) + "01";
     const nextMonth = new Date(today);
@@ -31,7 +20,7 @@ export const getManagerKpis = createServerFn({ method: "GET" })
     const monthEnd = nextMonth.toISOString().slice(0, 10);
 
     const [bookingsAll, monthPayments, todayPayments, aptCount, occupiedToday, pendingUnpaid, guests] = await Promise.all([
-      supabase.from("bookings").select("id, status, guest_id, created_at, check_in, check_out, total_bwp"),
+      supabase.from("bookings").select("id, status, guest_id, guest_email, created_at, check_in, check_out, total_bwp"),
       supabase.from("payments").select("amount_bwp, is_refund").gte("recorded_at", monthStart),
       supabase.from("payments").select("amount_bwp, is_refund").gte("recorded_at", today),
       supabase.from("apartments").select("id", { count: "exact", head: true }).eq("active", true),
@@ -78,7 +67,7 @@ export const getManagerKpis = createServerFn({ method: "GET" })
       expectedIn,
       expectedOut,
       outstanding,
-      monthProfit: monthRevenue, // no costs tracked yet
+      monthProfit: monthRevenue,
       repeatGuests,
       newGuestsThisMonth,
     };
@@ -89,8 +78,10 @@ export const getCalendarData = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ start: dateStr, end: dateStr }).parse(d))
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+
     const [bookings, blocks, apartments, holidays] = await Promise.all([
       supabase
         .from("bookings")
@@ -114,8 +105,10 @@ export const getCalendarData = createServerFn({ method: "POST" })
 export const listApartmentsAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await assertAdmin(context);
-    const { data, error } = await context.supabase.from("apartments").select("*").order("sort_order");
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { data, error } = await supabase.from("apartments").select("*").order("sort_order");
     if (error) throw new Error(error.message);
     return data ?? [];
   });
@@ -124,9 +117,9 @@ const apartmentSchema = z.object({
   id: z.string().uuid().optional(),
   slug: z.string().trim().min(1).max(60),
   name: z.string().trim().min(1).max(120),
-  eyebrow: z.string().trim().max(120).optional().nullable(),
-  description: z.string().trim().max(2000).optional().nullable(),
-  apartment_number: z.string().trim().max(20).optional().nullable(),
+  eyebrow: z.string().trim().max(120).default(""),
+  description: z.string().trim().max(2000).default(""),
+  apartment_number: z.string().trim().max(20).default(""),
   max_guests: z.number().int().min(1).max(20),
   base_rate_bwp: z.number().positive(),
   weekend_rate_bwp: z.number().positive().nullable().optional(),
@@ -141,8 +134,10 @@ export const upsertApartment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => apartmentSchema.parse(d))
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
-    const { error } = await context.supabase.from("apartments").upsert(data);
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { error } = await supabase.from("apartments").upsert(data);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -151,8 +146,10 @@ export const deleteApartment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
-    const { error } = await context.supabase.from("apartments").update({ active: false }).eq("id", data.id);
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { error } = await supabase.from("apartments").update({ active: false }).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -166,8 +163,10 @@ export const setCleaningStatus = createServerFn({ method: "POST" })
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
-    const { error } = await context.supabase.from("apartments").update({ cleaning_status: data.cleaning_status }).eq("id", data.apartment_id);
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { error } = await supabase.from("apartments").update({ cleaning_status: data.cleaning_status }).eq("id", data.apartment_id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -177,8 +176,10 @@ export const listGuests = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ search: z.string().trim().max(120).optional() }).parse(d))
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+
     let query = supabase
       .from("bookings")
       .select("guest_id, guest_name, guest_email, guest_phone, guest_id_number, nationality, vehicle_reg, total_bwp, check_in, status")
@@ -191,7 +192,6 @@ export const listGuests = createServerFn({ method: "POST" })
     const { data: rows, error } = await query;
     if (error) throw new Error(error.message);
 
-    type Row = NonNullable<typeof rows>[number];
     const map = new Map<string, {
       email: string;
       name: string;
@@ -203,7 +203,7 @@ export const listGuests = createServerFn({ method: "POST" })
       total_spent: number;
       last_stay: string;
     }>();
-    (rows ?? []).forEach((r: Row) => {
+    (rows ?? []).forEach((r) => {
       const k = r.guest_email ?? r.guest_phone ?? "";
       if (!k) return;
       const prev = map.get(k);
@@ -250,8 +250,10 @@ export const adminCreateBooking = createServerFn({ method: "POST" })
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
     const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+
     const { data: apt, error: aptErr } = await supabase.from("apartments").select("base_rate_bwp, max_guests").eq("id", data.apartment_id).maybeSingle();
     if (aptErr || !apt) throw new Error("Apartment not found");
     const nights = Math.round((new Date(data.check_out).getTime() - new Date(data.check_in).getTime()) / 86_400_000);
@@ -295,22 +297,22 @@ export const updateBookingStatus = createServerFn({ method: "POST" })
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
-    const now = new Date().toISOString();
-    const map = {
-      check_in: { status: "checked_in", checked_in_at: now },
-      check_out: { status: "checked_out", checked_out_at: now },
-      no_show: { status: "no_show" },
-    } as const;
-    const patch = map[data.action];
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
 
-    const { error } = await context.supabase.from("bookings").update(patch).eq("id", data.id);
+    const now = new Date().toISOString();
+    const patch: Record<string, string> =
+      data.action === "check_in" ? { status: "checked_in", checked_in_at: now }
+      : data.action === "check_out" ? { status: "checked_out", checked_out_at: now }
+      : { status: "no_show" };
+
+    const { error } = await supabase.from("bookings").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
 
-    // Mark apartment dirty on check-out
     if (data.action === "check_out") {
-      const { data: b } = await context.supabase.from("bookings").select("apartment_id").eq("id", data.id).maybeSingle();
-      if (b) await context.supabase.from("apartments").update({ cleaning_status: "dirty" }).eq("id", b.apartment_id);
+      const { data: b } = await supabase.from("bookings").select("apartment_id").eq("id", data.id).maybeSingle();
+      if (b) await supabase.from("apartments").update({ cleaning_status: "dirty" }).eq("id", b.apartment_id);
     }
     return { ok: true };
   });
@@ -320,8 +322,10 @@ export const extendBooking = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), new_check_out: dateStr }).parse(d))
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+
     const { data: b, error } = await supabase.from("bookings").select("check_in, nightly_rate_bwp").eq("id", data.id).maybeSingle();
     if (error || !b) throw new Error("Booking not found");
     const nights = Math.round((new Date(data.new_check_out).getTime() - new Date(b.check_in).getTime()) / 86_400_000);
@@ -337,8 +341,10 @@ export const getReport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ start: dateStr, end: dateStr }).parse(d))
   .handler(async ({ data, context }) => {
-    await assertAdmin(context);
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+
     const [payments, bookings] = await Promise.all([
       supabase.from("payments").select("amount_bwp, method, is_refund, recorded_at, booking_id").gte("recorded_at", data.start).lt("recorded_at", data.end + "T23:59:59"),
       supabase.from("bookings").select("id, reference, guest_name, check_in, check_out, nights, total_bwp, status, apartments(name)").gte("check_in", data.start).lt("check_in", data.end),
