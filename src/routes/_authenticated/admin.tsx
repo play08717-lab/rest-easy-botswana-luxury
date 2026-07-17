@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: async ({ context }) => {
-    // context.user set by parent _authenticated
     const { data, error } = await supabase
       .from("user_roles")
       .select("role")
@@ -17,14 +16,19 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 function AdminLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const tabs: Array<{ to: "/admin" | "/admin/bookings" | "/admin/settings"; label: string; exact?: boolean }> = [
+  const tabs: Array<{ to: "/admin" | "/admin/bookings" | "/admin/calendar" | "/admin/apartments" | "/admin/guests" | "/admin/housekeeping" | "/admin/reports" | "/admin/settings"; label: string; exact?: boolean }> = [
     { to: "/admin", label: "Dashboard", exact: true },
+    { to: "/admin/calendar", label: "Calendar" },
     { to: "/admin/bookings", label: "Bookings" },
+    { to: "/admin/apartments", label: "Apartments" },
+    { to: "/admin/guests", label: "Guests" },
+    { to: "/admin/housekeeping", label: "Housekeeping" },
+    { to: "/admin/reports", label: "Reports" },
     { to: "/admin/settings", label: "Settings" },
   ];
   return (
     <div>
-      <div className="border-b border-gold/15 pb-4 mb-8 flex flex-wrap gap-6">
+      <div className="border-b border-gold/15 pb-4 mb-8 flex flex-wrap gap-x-6 gap-y-3">
         {tabs.map((t) => {
           const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
           return (

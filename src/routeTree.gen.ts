@@ -24,7 +24,12 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
+import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
+import { Route as AuthenticatedAdminHousekeepingRouteImport } from './routes/_authenticated/admin.housekeeping'
+import { Route as AuthenticatedAdminGuestsRouteImport } from './routes/_authenticated/admin.guests'
+import { Route as AuthenticatedAdminCalendarRouteImport } from './routes/_authenticated/admin.calendar'
 import { Route as AuthenticatedAdminBookingsRouteImport } from './routes/_authenticated/admin.bookings'
+import { Route as AuthenticatedAdminApartmentsRouteImport } from './routes/_authenticated/admin.apartments'
 import { Route as AuthenticatedAccountBookingIdRouteImport } from './routes/_authenticated/account.$bookingId'
 
 const WhyChooseUsRoute = WhyChooseUsRouteImport.update({
@@ -102,10 +107,40 @@ const AuthenticatedAdminSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminReportsRoute =
+  AuthenticatedAdminReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminHousekeepingRoute =
+  AuthenticatedAdminHousekeepingRouteImport.update({
+    id: '/housekeeping',
+    path: '/housekeeping',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminGuestsRoute =
+  AuthenticatedAdminGuestsRouteImport.update({
+    id: '/guests',
+    path: '/guests',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCalendarRoute =
+  AuthenticatedAdminCalendarRouteImport.update({
+    id: '/calendar',
+    path: '/calendar',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminBookingsRoute =
   AuthenticatedAdminBookingsRouteImport.update({
     id: '/bookings',
     path: '/bookings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminApartmentsRoute =
+  AuthenticatedAdminApartmentsRouteImport.update({
+    id: '/apartments',
+    path: '/apartments',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAccountBookingIdRoute =
@@ -129,7 +164,12 @@ export interface FileRoutesByFullPath {
   '/account': typeof AuthenticatedAccountRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/account/$bookingId': typeof AuthenticatedAccountBookingIdRoute
+  '/admin/apartments': typeof AuthenticatedAdminApartmentsRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
+  '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
+  '/admin/guests': typeof AuthenticatedAdminGuestsRoute
+  '/admin/housekeeping': typeof AuthenticatedAdminHousekeepingRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -146,7 +186,12 @@ export interface FileRoutesByTo {
   '/why-choose-us': typeof WhyChooseUsRoute
   '/account': typeof AuthenticatedAccountRouteWithChildren
   '/account/$bookingId': typeof AuthenticatedAccountBookingIdRoute
+  '/admin/apartments': typeof AuthenticatedAdminApartmentsRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
+  '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
+  '/admin/guests': typeof AuthenticatedAdminGuestsRoute
+  '/admin/housekeeping': typeof AuthenticatedAdminHousekeepingRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
@@ -166,7 +211,12 @@ export interface FileRoutesById {
   '/_authenticated/account': typeof AuthenticatedAccountRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/account/$bookingId': typeof AuthenticatedAccountBookingIdRoute
+  '/_authenticated/admin/apartments': typeof AuthenticatedAdminApartmentsRoute
   '/_authenticated/admin/bookings': typeof AuthenticatedAdminBookingsRoute
+  '/_authenticated/admin/calendar': typeof AuthenticatedAdminCalendarRoute
+  '/_authenticated/admin/guests': typeof AuthenticatedAdminGuestsRoute
+  '/_authenticated/admin/housekeeping': typeof AuthenticatedAdminHousekeepingRoute
+  '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -186,7 +236,12 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/account/$bookingId'
+    | '/admin/apartments'
     | '/admin/bookings'
+    | '/admin/calendar'
+    | '/admin/guests'
+    | '/admin/housekeeping'
+    | '/admin/reports'
     | '/admin/settings'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -203,7 +258,12 @@ export interface FileRouteTypes {
     | '/why-choose-us'
     | '/account'
     | '/account/$bookingId'
+    | '/admin/apartments'
     | '/admin/bookings'
+    | '/admin/calendar'
+    | '/admin/guests'
+    | '/admin/housekeeping'
+    | '/admin/reports'
     | '/admin/settings'
     | '/admin'
   id:
@@ -222,7 +282,12 @@ export interface FileRouteTypes {
     | '/_authenticated/account'
     | '/_authenticated/admin'
     | '/_authenticated/account/$bookingId'
+    | '/_authenticated/admin/apartments'
     | '/_authenticated/admin/bookings'
+    | '/_authenticated/admin/calendar'
+    | '/_authenticated/admin/guests'
+    | '/_authenticated/admin/housekeeping'
+    | '/_authenticated/admin/reports'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
@@ -348,11 +413,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/reports': {
+      id: '/_authenticated/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/housekeeping': {
+      id: '/_authenticated/admin/housekeeping'
+      path: '/housekeeping'
+      fullPath: '/admin/housekeeping'
+      preLoaderRoute: typeof AuthenticatedAdminHousekeepingRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/guests': {
+      id: '/_authenticated/admin/guests'
+      path: '/guests'
+      fullPath: '/admin/guests'
+      preLoaderRoute: typeof AuthenticatedAdminGuestsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/calendar': {
+      id: '/_authenticated/admin/calendar'
+      path: '/calendar'
+      fullPath: '/admin/calendar'
+      preLoaderRoute: typeof AuthenticatedAdminCalendarRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/bookings': {
       id: '/_authenticated/admin/bookings'
       path: '/bookings'
       fullPath: '/admin/bookings'
       preLoaderRoute: typeof AuthenticatedAdminBookingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/apartments': {
+      id: '/_authenticated/admin/apartments'
+      path: '/apartments'
+      fullPath: '/admin/apartments'
+      preLoaderRoute: typeof AuthenticatedAdminApartmentsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/account/$bookingId': {
@@ -377,13 +477,23 @@ const AuthenticatedAccountRouteWithChildren =
   AuthenticatedAccountRoute._addFileChildren(AuthenticatedAccountRouteChildren)
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminApartmentsRoute: typeof AuthenticatedAdminApartmentsRoute
   AuthenticatedAdminBookingsRoute: typeof AuthenticatedAdminBookingsRoute
+  AuthenticatedAdminCalendarRoute: typeof AuthenticatedAdminCalendarRoute
+  AuthenticatedAdminGuestsRoute: typeof AuthenticatedAdminGuestsRoute
+  AuthenticatedAdminHousekeepingRoute: typeof AuthenticatedAdminHousekeepingRoute
+  AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminApartmentsRoute: AuthenticatedAdminApartmentsRoute,
   AuthenticatedAdminBookingsRoute: AuthenticatedAdminBookingsRoute,
+  AuthenticatedAdminCalendarRoute: AuthenticatedAdminCalendarRoute,
+  AuthenticatedAdminGuestsRoute: AuthenticatedAdminGuestsRoute,
+  AuthenticatedAdminHousekeepingRoute: AuthenticatedAdminHousekeepingRoute,
+  AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
@@ -420,13 +530,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

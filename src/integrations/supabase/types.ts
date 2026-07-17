@@ -47,11 +47,15 @@ export type Database = {
       apartments: {
         Row: {
           active: boolean
+          apartment_number: string | null
+          availability: string
           base_rate_bwp: number
+          cleaning_status: string
           created_at: string
           description: string
           eyebrow: string | null
           features: string[]
+          holiday_rate_bwp: number | null
           id: string
           images: string[]
           max_guests: number
@@ -60,14 +64,19 @@ export type Database = {
           slug: string
           sort_order: number
           updated_at: string
+          weekend_rate_bwp: number | null
         }
         Insert: {
           active?: boolean
+          apartment_number?: string | null
+          availability?: string
           base_rate_bwp: number
+          cleaning_status?: string
           created_at?: string
           description: string
           eyebrow?: string | null
           features?: string[]
+          holiday_rate_bwp?: number | null
           id?: string
           images?: string[]
           max_guests?: number
@@ -76,14 +85,19 @@ export type Database = {
           slug: string
           sort_order?: number
           updated_at?: string
+          weekend_rate_bwp?: number | null
         }
         Update: {
           active?: boolean
+          apartment_number?: string | null
+          availability?: string
           base_rate_bwp?: number
+          cleaning_status?: string
           created_at?: string
           description?: string
           eyebrow?: string | null
           features?: string[]
+          holiday_rate_bwp?: number | null
           id?: string
           images?: string[]
           max_guests?: number
@@ -92,6 +106,7 @@ export type Database = {
           slug?: string
           sort_order?: number
           updated_at?: string
+          weekend_rate_bwp?: number | null
         }
         Relationships: []
       }
@@ -141,22 +156,30 @@ export type Database = {
           cancelled_at: string | null
           check_in: string
           check_out: string
+          checked_in_at: string | null
+          checked_out_at: string | null
           created_at: string
+          emergency_contact: string | null
           guest_email: string
-          guest_id: string
+          guest_id: string | null
           guest_id_number: string | null
           guest_name: string
           guest_phone: string
           guests: number
           hold_expires_at: string | null
           id: string
+          is_group: boolean
+          nationality: string | null
           nightly_rate_bwp: number
           nights: number
+          notes: string | null
           reference: string
+          source: string
           special_requests: string | null
           status: Database["public"]["Enums"]["booking_status"]
           total_bwp: number
           updated_at: string
+          vehicle_reg: string | null
         }
         Insert: {
           apartment_id: string
@@ -165,22 +188,30 @@ export type Database = {
           cancelled_at?: string | null
           check_in: string
           check_out: string
+          checked_in_at?: string | null
+          checked_out_at?: string | null
           created_at?: string
+          emergency_contact?: string | null
           guest_email: string
-          guest_id: string
+          guest_id?: string | null
           guest_id_number?: string | null
           guest_name: string
           guest_phone: string
           guests?: number
           hold_expires_at?: string | null
           id?: string
+          is_group?: boolean
+          nationality?: string | null
           nightly_rate_bwp: number
           nights: number
+          notes?: string | null
           reference?: string
+          source?: string
           special_requests?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
           total_bwp: number
           updated_at?: string
+          vehicle_reg?: string | null
         }
         Update: {
           apartment_id?: string
@@ -189,22 +220,30 @@ export type Database = {
           cancelled_at?: string | null
           check_in?: string
           check_out?: string
+          checked_in_at?: string | null
+          checked_out_at?: string | null
           created_at?: string
+          emergency_contact?: string | null
           guest_email?: string
-          guest_id?: string
+          guest_id?: string | null
           guest_id_number?: string | null
           guest_name?: string
           guest_phone?: string
           guests?: number
           hold_expires_at?: string | null
           id?: string
+          is_group?: boolean
+          nationality?: string | null
           nightly_rate_bwp?: number
           nights?: number
+          notes?: string | null
           reference?: string
+          source?: string
           special_requests?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
           total_bwp?: number
           updated_at?: string
+          vehicle_reg?: string | null
         }
         Relationships: [
           {
@@ -215,6 +254,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      holidays: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          name: string
+          rate_multiplier: number
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          name: string
+          rate_multiplier?: number
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          name?: string
+          rate_multiplier?: number
+        }
+        Relationships: []
       }
       messages: {
         Row: {
@@ -297,6 +360,8 @@ export type Database = {
           amount_bwp: number
           booking_id: string
           id: string
+          is_deposit: boolean
+          is_refund: boolean
           method: Database["public"]["Enums"]["payment_method"]
           note: string | null
           proof_url: string | null
@@ -308,6 +373,8 @@ export type Database = {
           amount_bwp: number
           booking_id: string
           id?: string
+          is_deposit?: boolean
+          is_refund?: boolean
           method?: Database["public"]["Enums"]["payment_method"]
           note?: string | null
           proof_url?: string | null
@@ -319,6 +386,8 @@ export type Database = {
           amount_bwp?: number
           booking_id?: string
           id?: string
+          is_deposit?: boolean
+          is_refund?: boolean
           method?: Database["public"]["Enums"]["payment_method"]
           note?: string | null
           proof_url?: string | null
@@ -375,12 +444,17 @@ export type Database = {
           bank_name: string
           bank_swift: string
           cancellation_hours: number
+          cancellation_policy: string
           check_in_time: string
           check_out_time: string
           contact_email: string
           contact_phone: string
+          facebook_url: string
           hold_hours: number
           id: number
+          instagram_url: string
+          logo_url: string
+          tax_rate: number
           updated_at: string
           welcome_message: string
           whatsapp_number: string
@@ -393,12 +467,17 @@ export type Database = {
           bank_name?: string
           bank_swift?: string
           cancellation_hours?: number
+          cancellation_policy?: string
           check_in_time?: string
           check_out_time?: string
           contact_email?: string
           contact_phone?: string
+          facebook_url?: string
           hold_hours?: number
           id?: number
+          instagram_url?: string
+          logo_url?: string
+          tax_rate?: number
           updated_at?: string
           welcome_message?: string
           whatsapp_number?: string
@@ -411,17 +490,60 @@ export type Database = {
           bank_name?: string
           bank_swift?: string
           cancellation_hours?: number
+          cancellation_policy?: string
           check_in_time?: string
           check_out_time?: string
           contact_email?: string
           contact_phone?: string
+          facebook_url?: string
           hold_hours?: number
           id?: number
+          instagram_url?: string
+          logo_url?: string
+          tax_rate?: number
           updated_at?: string
           welcome_message?: string
           whatsapp_number?: string
         }
         Relationships: []
+      }
+      special_rates: {
+        Row: {
+          apartment_id: string
+          created_at: string
+          end_date: string
+          id: string
+          label: string | null
+          rate_bwp: number
+          start_date: string
+        }
+        Insert: {
+          apartment_id: string
+          created_at?: string
+          end_date: string
+          id?: string
+          label?: string | null
+          rate_bwp: number
+          start_date: string
+        }
+        Update: {
+          apartment_id?: string
+          created_at?: string
+          end_date?: string
+          id?: string
+          label?: string | null
+          rate_bwp?: number
+          start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "special_rates_apartment_id_fkey"
+            columns: ["apartment_id"]
+            isOneToOne: false
+            referencedRelation: "apartments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -484,7 +606,7 @@ export type Database = {
         | "checked_out"
         | "no_show"
       message_sender: "guest" | "admin"
-      payment_method: "bank_transfer" | "cash" | "other"
+      payment_method: "bank_transfer" | "cash" | "other" | "orange_money"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -622,7 +744,7 @@ export const Constants = {
         "no_show",
       ],
       message_sender: ["guest", "admin"],
-      payment_method: ["bank_transfer", "cash", "other"],
+      payment_method: ["bank_transfer", "cash", "other", "orange_money"],
     },
   },
 } as const
