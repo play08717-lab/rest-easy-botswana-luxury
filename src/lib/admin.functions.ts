@@ -279,8 +279,8 @@ export const adminCreateBooking = createServerFn({ method: "POST" })
         source: data.source,
         is_group: data.is_group,
         notes: data.notes ?? null,
-        created_by: userId,
       })
+
       .select("id, reference")
       .single();
     if (error) throw new Error(error.message);
@@ -302,13 +302,17 @@ export const updateBookingStatus = createServerFn({ method: "POST" })
     if (!isAdmin) throw new Error("Forbidden");
 
     const now = new Date().toISOString();
-    const patch: Record<string, string> =
-      data.action === "check_in" ? { status: "checked_in", checked_in_at: now }
-      : data.action === "check_out" ? { status: "checked_out", checked_out_at: now }
-      : { status: "no_show" };
+    if (data.action === "check_in") {
+      const { error } = await supabase.from("bookings").update({ status: "checked_in", checked_in_at: now }).eq("id", data.id);
+      if (error) throw new Error(error.message);
+    } else if (data.action === "check_out") {
+      const { error } = await supabase.from("bookings").update({ status: "checked_out", checked_out_at: now }).eq("id", data.id);
+      if (error) throw new Error(error.message);
+    } else {
+      const { error } = await supabase.from("bookings").update({ status: "no_show" }).eq("id", data.id);
+      if (error) throw new Error(error.message);
+    }
 
-    const { error } = await supabase.from("bookings").update(patch).eq("id", data.id);
-    if (error) throw new Error(error.message);
 
     if (data.action === "check_out") {
       const { data: b } = await supabase.from("bookings").select("apartment_id").eq("id", data.id).maybeSingle();
