@@ -252,7 +252,7 @@ export const markBookingPaid = createServerFn({ method: "POST" })
       .object({
         booking_id: z.string().uuid(),
         amount_bwp: z.number().positive(),
-        method: z.enum(["bank_transfer", "cash", "other"]).default("bank_transfer"),
+        method: z.enum(["bank_transfer", "cash", "orange_money", "other"]).default("bank_transfer"),
         reference: z.string().trim().max(120).optional(),
         note: z.string().trim().max(500).optional(),
       })
