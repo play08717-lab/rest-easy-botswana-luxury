@@ -171,6 +171,40 @@ export const setCleaningStatus = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ---------------- Housekeeping check-in readiness ----------------
+export const getCheckInReadiness = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+
+    const today = new Date().toISOString().slice(0, 10);
+    const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
+
+    const [arrivalsToday, arrivalsTomorrow, apartments] = await Promise.all([
+      supabase
+        .from("bookings")
+        .select("id, reference, guest_name, guests, check_in, check_out, apartment_id, apartments(name, apartment_number, cleaning_status)")
+        .eq("check_in", today)
+        .in("status", ["confirmed", "pending_payment"]),
+      supabase
+        .from("bookings")
+        .select("id, reference, guest_name, guests, check_in, check_out, apartment_id, apartments(name, apartment_number, cleaning_status)")
+        .eq("check_in", tomorrow)
+        .in("status", ["confirmed", "pending_payment"]),
+      supabase.from("apartments").select("id, name, apartment_number, cleaning_status").eq("active", true).order("sort_order"),
+    ]);
+
+    return {
+      today,
+      tomorrow,
+      arrivalsToday: arrivalsToday.data ?? [],
+      arrivalsTomorrow: arrivalsTomorrow.data ?? [],
+      apartments: apartments.data ?? [],
+    };
+  });
+
 // ---------------- Guests directory ----------------
 export const listGuests = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
