@@ -255,6 +255,82 @@ export type Database = {
           },
         ]
       }
+      checklist_items: {
+        Row: {
+          active: boolean
+          apartment_id: string
+          created_at: string
+          id: string
+          label: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          apartment_id: string
+          created_at?: string
+          id?: string
+          label: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          apartment_id?: string
+          created_at?: string
+          id?: string
+          label?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_items_apartment_id_fkey"
+            columns: ["apartment_id"]
+            isOneToOne: false
+            referencedRelation: "apartments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      checklist_runs: {
+        Row: {
+          apartment_id: string
+          completed_by: string | null
+          completed_item_ids: string[]
+          created_at: string
+          id: string
+          item_labels: Json
+          notes: string | null
+        }
+        Insert: {
+          apartment_id: string
+          completed_by?: string | null
+          completed_item_ids?: string[]
+          created_at?: string
+          id?: string
+          item_labels?: Json
+          notes?: string | null
+        }
+        Update: {
+          apartment_id?: string
+          completed_by?: string | null
+          completed_item_ids?: string[]
+          created_at?: string
+          id?: string
+          item_labels?: Json
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_runs_apartment_id_fkey"
+            columns: ["apartment_id"]
+            isOneToOne: false
+            referencedRelation: "apartments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       holidays: {
         Row: {
           created_at: string
