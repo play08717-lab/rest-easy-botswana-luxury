@@ -159,7 +159,7 @@ export const setCleaningStatus = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
     z.object({
       apartment_id: z.string().uuid(),
-      cleaning_status: z.enum(["clean", "dirty", "cleaning", "maintenance"]),
+      cleaning_status: z.enum(["dirty", "cleaning", "maintenance"]),
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
@@ -168,6 +168,109 @@ export const setCleaningStatus = createServerFn({ method: "POST" })
     if (!isAdmin) throw new Error("Forbidden");
     const { error } = await supabase.from("apartments").update({ cleaning_status: data.cleaning_status }).eq("id", data.apartment_id);
     if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// ---------------- Pre-check-in checklist ----------------
+export const listChecklistItems = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ apartment_id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("checklist_items")
+      .select("id, apartment_id, label, sort_order, active")
+      .eq("apartment_id", data.apartment_id)
+      .order("sort_order")
+      .order("created_at");
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const upsertChecklistItem = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({
+      id: z.string().uuid().optional(),
+      apartment_id: z.string().uuid(),
+      label: z.string().min(1).max(200),
+      sort_order: z.number().int().default(0),
+      active: z.boolean().default(true),
+    }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+    if (data.id) {
+      const { error } = await supabase.from("checklist_items")
+        .update({ label: data.label, sort_order: data.sort_order, active: data.active })
+        .eq("id", data.id);
+      if (error) throw new Error(error.message);
+    } else {
+      const { error } = await supabase.from("checklist_items")
+        .insert({ apartment_id: data.apartment_id, label: data.label, sort_order: data.sort_order, active: data.active });
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true };
+  });
+
+export const deleteChecklistItem = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { error } = await supabase.from("checklist_items").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const markApartmentReady = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({
+      apartment_id: z.string().uuid(),
+      completed_item_ids: z.array(z.string().uuid()),
+      notes: z.string().max(1000).optional(),
+    }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+
+    const { data: items, error: itemsErr } = await supabase
+      .from("checklist_items")
+      .select("id, label")
+      .eq("apartment_id", data.apartment_id)
+      .eq("active", true);
+    if (itemsErr) throw new Error(itemsErr.message);
+
+    const required = (items ?? []).map((i) => i.id);
+    const completed = new Set(data.completed_item_ids);
+    const missing = required.filter((id) => !completed.has(id));
+    if (missing.length > 0) {
+      throw new Error(`Checklist incomplete: ${missing.length} item(s) still pending.`);
+    }
+
+    const labels = (items ?? []).map((i) => ({ id: i.id, label: i.label }));
+    const { error: runErr } = await supabase.from("checklist_runs").insert({
+      apartment_id: data.apartment_id,
+      completed_by: userId,
+      completed_item_ids: data.completed_item_ids,
+      item_labels: labels,
+      notes: data.notes ?? null,
+    });
+    if (runErr) throw new Error(runErr.message);
+
+    const { error: aptErr } = await supabase
+      .from("apartments")
+      .update({ cleaning_status: "clean" })
+      .eq("id", data.apartment_id);
+    if (aptErr) throw new Error(aptErr.message);
+
     return { ok: true };
   });
 
