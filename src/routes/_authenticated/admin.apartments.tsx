@@ -3,6 +3,7 @@ import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listApartmentsAdmin, upsertApartment, setCleaningStatus, deleteApartment } from "@/lib/admin.functions";
 import { useState } from "react";
+import { MarkReadyDialog, ChecklistManagerDialog } from "@/components/ChecklistDialogs";
 
 export const Route = createFileRoute("/_authenticated/admin/apartments")({
   head: () => ({ meta: [{ title: "Apartments — Admin" }, { name: "robots", content: "noindex" }] }),
@@ -19,6 +20,8 @@ function AptsPage() {
   const setStatus = useServerFn(setCleaningStatus);
   const del = useServerFn(deleteApartment);
   const [editing, setEditing] = useState<Apt | "new" | null>(null);
+  const [readying, setReadying] = useState<Apt | null>(null);
+  const [managingChecklist, setManagingChecklist] = useState<Apt | null>(null);
   const refresh = () => qc.invalidateQueries({ queryKey: ["admin-apartments"] });
 
   return (
@@ -29,40 +32,57 @@ function AptsPage() {
       </div>
 
       <div className="grid gap-3">
-        {apts.map((a) => (
-          <div key={a.id} className="bg-dark border border-gold/15 p-5 grid md:grid-cols-[1fr_auto_auto_auto] gap-4 items-center">
-            <div>
-              <p className="font-display text-lg text-paper">{a.name} {a.apartment_number && <span className="text-paper/40 text-sm">· #{a.apartment_number}</span>}</p>
-              <p className="text-xs text-paper/50 mt-1">
-                Base P{Number(a.base_rate_bwp).toFixed(2)}
-                {a.weekend_rate_bwp && ` · Weekend P${Number(a.weekend_rate_bwp).toFixed(2)}`}
-                {a.holiday_rate_bwp && ` · Holiday P${Number(a.holiday_rate_bwp).toFixed(2)}`}
-                {" · Max "}{a.max_guests} guests {!a.active && <span className="text-red-400">· Inactive</span>}
-              </p>
+        {apts.map((a) => {
+          const status = a.cleaning_status ?? "clean";
+          return (
+            <div key={a.id} className="bg-dark border border-gold/15 p-5 grid md:grid-cols-[1fr_auto_auto_auto_auto_auto] gap-4 items-center">
+              <div>
+                <p className="font-display text-lg text-paper">{a.name} {a.apartment_number && <span className="text-paper/40 text-sm">· #{a.apartment_number}</span>}</p>
+                <p className="text-xs text-paper/50 mt-1">
+                  Base P{Number(a.base_rate_bwp).toFixed(2)}
+                  {a.weekend_rate_bwp && ` · Weekend P${Number(a.weekend_rate_bwp).toFixed(2)}`}
+                  {a.holiday_rate_bwp && ` · Holiday P${Number(a.holiday_rate_bwp).toFixed(2)}`}
+                  {" · Max "}{a.max_guests} guests {!a.active && <span className="text-red-400">· Inactive</span>}
+                </p>
+                <p className="text-[10px] uppercase tracking-widest mt-1 text-paper/50">Status: <span className={status === "clean" ? "text-emerald-400" : "text-amber-400"}>{status}</span></p>
+              </div>
+              <select
+                value={status === "clean" ? "" : status}
+                onChange={async (e) => {
+                  const v = e.target.value as "dirty" | "cleaning" | "maintenance";
+                  if (!v) return;
+                  await setStatus({ data: { apartment_id: a.id, cleaning_status: v } });
+                  refresh();
+                }}
+                className="bg-paper/5 border border-gold/20 px-3 py-2 text-xs"
+              >
+                <option value="" disabled>{status === "clean" ? "Ready" : "Change…"}</option>
+                <option value="dirty">Dirty</option>
+                <option value="cleaning">Cleaning</option>
+                <option value="maintenance">Maintenance</option>
+              </select>
+              <button
+                onClick={() => setReadying(a)}
+                className="text-[10px] uppercase tracking-widest border border-emerald-400/40 text-emerald-400 px-3 py-2 hover:bg-emerald-400/10"
+              >Mark ready</button>
+              <button onClick={() => setManagingChecklist(a)} className="text-xs uppercase tracking-[0.2em] text-paper/70 hover:text-gold">Checklist</button>
+              <button onClick={() => setEditing(a)} className="text-xs uppercase tracking-[0.2em] text-gold hover:text-gold-light">Edit</button>
+              <button
+                onClick={async () => { if (confirm("Deactivate?")) { await del({ data: { id: a.id } }); refresh(); } }}
+                className="text-xs uppercase tracking-[0.2em] text-red-400 hover:text-red-300"
+              >Remove</button>
             </div>
-            <select
-              value={a.cleaning_status ?? "clean"}
-              onChange={async (e) => { await setStatus({ data: { apartment_id: a.id, cleaning_status: e.target.value as "clean" | "dirty" | "cleaning" | "maintenance" } }); refresh(); }}
-              className="bg-paper/5 border border-gold/20 px-3 py-2 text-xs"
-            >
-              <option value="clean">Clean</option>
-              <option value="dirty">Dirty</option>
-              <option value="cleaning">Cleaning</option>
-              <option value="maintenance">Maintenance</option>
-            </select>
-            <button onClick={() => setEditing(a)} className="text-xs uppercase tracking-[0.2em] text-gold hover:text-gold-light">Edit</button>
-            <button
-              onClick={async () => { if (confirm("Deactivate?")) { await del({ data: { id: a.id } }); refresh(); } }}
-              className="text-xs uppercase tracking-[0.2em] text-red-400 hover:text-red-300"
-            >Remove</button>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {editing && <EditModal initial={editing === "new" ? null : editing} onClose={() => setEditing(null)} onSaved={() => { refresh(); setEditing(null); }} />}
+      {readying && <MarkReadyDialog apartmentId={readying.id} apartmentName={readying.name} onClose={() => setReadying(null)} />}
+      {managingChecklist && <ChecklistManagerDialog apartmentId={managingChecklist.id} apartmentName={managingChecklist.name} onClose={() => setManagingChecklist(null)} />}
     </div>
   );
 }
+
 
 function EditModal({ initial, onClose, onSaved }: { initial: Apt | null; onClose: () => void; onSaved: () => void }) {
   const save = useServerFn(upsertApartment);
