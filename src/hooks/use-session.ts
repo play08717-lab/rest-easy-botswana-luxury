@@ -40,3 +40,25 @@ export function useIsAdmin() {
   }, [user]);
   return isAdmin;
 }
+
+export function useIdleLogout(minutes = 30) {
+  useEffect(() => {
+    const ms = minutes * 60_000;
+    let timer: ReturnType<typeof setTimeout>;
+    const reset = () => {
+      clearTimeout(timer);
+      timer = setTimeout(async () => {
+        await supabase.auth.signOut();
+        window.location.assign("/auth");
+      }, ms);
+    };
+    const events = ["mousemove", "keydown", "click", "scroll", "touchstart", "visibilitychange"];
+    events.forEach((e) => window.addEventListener(e, reset, { passive: true }));
+    reset();
+    return () => {
+      clearTimeout(timer);
+      events.forEach((e) => window.removeEventListener(e, reset));
+    };
+  }, [minutes]);
+}
+
