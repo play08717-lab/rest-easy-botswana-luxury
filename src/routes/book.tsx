@@ -41,6 +41,10 @@ function BookPage() {
   const [guestPhone, setGuestPhone] = useState("");
   const [requests, setRequests] = useState("");
   const [booking, setBooking] = useState(false);
+  const [consents, setConsents] = useState({
+    privacy: false, terms: false, cancellation: false, house_rules: false,
+  });
+  const allConsented = consents.privacy && consents.terms && consents.cancellation && consents.house_rules;
 
   const runSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +59,7 @@ function BookPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selected) return;
+    if (!allConsented) { setErr("Please accept the policies to continue."); return; }
     setErr(""); setBooking(true);
     try {
       const b = await create({
@@ -63,12 +68,19 @@ function BookPage() {
           check_in: checkIn, check_out: checkOut, guests,
           guest_name: guestName, guest_email: guestEmail, guest_phone: guestPhone,
           special_requests: requests || null,
+          consents: {
+            privacy: true as const,
+            terms: true as const,
+            cancellation: true as const,
+            house_rules: true as const,
+          },
         },
       });
       navigate({ to: "/account/$bookingId", params: { bookingId: b.id } });
     } catch (e) { setErr(e instanceof Error ? e.message : "Booking failed"); }
     setBooking(false);
   };
+
 
   return (
     <>
