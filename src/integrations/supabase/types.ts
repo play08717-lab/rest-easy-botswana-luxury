@@ -158,6 +158,7 @@ export type Database = {
           check_out: string
           checked_in_at: string | null
           checked_out_at: string | null
+          consents: Json | null
           created_at: string
           emergency_contact: string | null
           guest_email: string
@@ -190,6 +191,7 @@ export type Database = {
           check_out: string
           checked_in_at?: string | null
           checked_out_at?: string | null
+          consents?: Json | null
           created_at?: string
           emergency_contact?: string | null
           guest_email: string
@@ -222,6 +224,7 @@ export type Database = {
           check_out?: string
           checked_in_at?: string | null
           checked_out_at?: string | null
+          consents?: Json | null
           created_at?: string
           emergency_contact?: string | null
           guest_email?: string

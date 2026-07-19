@@ -41,6 +41,10 @@ function BookPage() {
   const [guestPhone, setGuestPhone] = useState("");
   const [requests, setRequests] = useState("");
   const [booking, setBooking] = useState(false);
+  const [consents, setConsents] = useState({
+    privacy: false, terms: false, cancellation: false, house_rules: false,
+  });
+  const allConsented = consents.privacy && consents.terms && consents.cancellation && consents.house_rules;
 
   const runSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +59,7 @@ function BookPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selected) return;
+    if (!allConsented) { setErr("Please accept the policies to continue."); return; }
     setErr(""); setBooking(true);
     try {
       const b = await create({
@@ -63,12 +68,19 @@ function BookPage() {
           check_in: checkIn, check_out: checkOut, guests,
           guest_name: guestName, guest_email: guestEmail, guest_phone: guestPhone,
           special_requests: requests || null,
+          consents: {
+            privacy: true as const,
+            terms: true as const,
+            cancellation: true as const,
+            house_rules: true as const,
+          },
         },
       });
       navigate({ to: "/account/$bookingId", params: { bookingId: b.id } });
     } catch (e) { setErr(e instanceof Error ? e.message : "Booking failed"); }
     setBooking(false);
   };
+
 
   return (
     <>
@@ -149,15 +161,27 @@ function BookPage() {
               <Field label="Special requests (optional)">
                 <input value={requests} onChange={(e) => setRequests(e.target.value)} className="w-full bg-transparent border-b border-gold/30 py-2 text-paper" />
               </Field>
+              <fieldset className="md:col-span-2 mt-4 border-t border-gold/10 pt-6 space-y-3">
+                <legend className="text-[10px] uppercase tracking-[0.3em] text-gold mb-2">Please confirm</legend>
+                <ConsentRow checked={consents.privacy} onChange={(v) => setConsents((c) => ({ ...c, privacy: v }))}
+                  label={<>I have read and agree to the <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-gold">Privacy Policy</a>.</>} />
+                <ConsentRow checked={consents.terms} onChange={(v) => setConsents((c) => ({ ...c, terms: v }))}
+                  label={<>I agree to the <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-gold">Terms & Conditions</a>.</>} />
+                <ConsentRow checked={consents.cancellation} onChange={(v) => setConsents((c) => ({ ...c, cancellation: v }))}
+                  label={<>I agree to the <a href="/cancellation" target="_blank" rel="noopener noreferrer" className="underline hover:text-gold">Cancellation Policy</a>.</>} />
+                <ConsentRow checked={consents.house_rules} onChange={(v) => setConsents((c) => ({ ...c, house_rules: v }))}
+                  label={<>I understand the <a href="/house-rules" target="_blank" rel="noopener noreferrer" className="underline hover:text-gold">House Rules</a>.</>} />
+              </fieldset>
               <div className="md:col-span-2 flex items-center justify-between border-t border-gold/10 pt-6 mt-4">
                 <div>
                   <p className="text-[10px] uppercase tracking-widest text-paper/50">Total to pay</p>
                   <p className="font-display text-3xl text-gold-light">P{Number(selected.total_bwp).toFixed(2)}</p>
                 </div>
-                <button disabled={booking} className="bg-gold text-dark px-8 py-4 text-[11px] uppercase tracking-[0.2em] font-semibold disabled:opacity-50">
+                <button disabled={booking || !allConsented} title={!allConsented ? "Please accept the policies above" : undefined} className="bg-gold text-dark px-8 py-4 text-[11px] uppercase tracking-[0.2em] font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
                   {booking ? "Reserving…" : "Reserve"}
                 </button>
               </div>
+
             </form>
           )}
         </section>
@@ -171,6 +195,16 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <label className="block">
       <span className="text-[10px] uppercase tracking-[0.3em] text-paper/60">{label}</span>
       <div className="mt-2">{children}</div>
+    </label>
+  );
+}
+
+function ConsentRow({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: React.ReactNode }) {
+  return (
+    <label className="flex items-start gap-3 text-sm text-paper/75 cursor-pointer">
+      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} required
+        className="mt-1 h-4 w-4 accent-gold" />
+      <span>{label}</span>
     </label>
   );
 }

@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { useIdleLogout } from "@/hooks/use-session";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -10,5 +11,11 @@ export const Route = createFileRoute("/_authenticated")({
     }
     return { user: data.user };
   },
-  component: () => <Outlet />,
+  component: AuthedLayout,
 });
+
+function AuthedLayout() {
+  useIdleLogout(30);
+  return <Outlet />;
+}
+

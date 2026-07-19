@@ -10,10 +10,15 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WhyChooseUsRouteImport } from './routes/why-choose-us'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as NearbyRouteImport } from './routes/nearby'
+import { Route as HouseRulesRouteImport } from './routes/house-rules'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CancellationRouteImport } from './routes/cancellation'
 import { Route as BookRouteImport } from './routes/book'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ApartmentsRouteImport } from './routes/apartments'
@@ -37,9 +42,24 @@ const WhyChooseUsRoute = WhyChooseUsRouteImport.update({
   path: '/why-choose-us',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NearbyRoute = NearbyRouteImport.update({
   id: '/nearby',
   path: '/nearby',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HouseRulesRoute = HouseRulesRouteImport.update({
+  id: '/house-rules',
+  path: '/house-rules',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GalleryRoute = GalleryRouteImport.update({
@@ -52,9 +72,19 @@ const FaqRoute = FaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CookiesRoute = CookiesRouteImport.update({
+  id: '/cookies',
+  path: '/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CancellationRoute = CancellationRouteImport.update({
+  id: '/cancellation',
+  path: '/cancellation',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookRoute = BookRouteImport.update({
@@ -156,10 +186,15 @@ export interface FileRoutesByFullPath {
   '/apartments': typeof ApartmentsRoute
   '/auth': typeof AuthRoute
   '/book': typeof BookRoute
+  '/cancellation': typeof CancellationRoute
   '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
+  '/house-rules': typeof HouseRulesRoute
   '/nearby': typeof NearbyRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/why-choose-us': typeof WhyChooseUsRoute
   '/account': typeof AuthenticatedAccountRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteWithChildren
@@ -179,10 +214,15 @@ export interface FileRoutesByTo {
   '/apartments': typeof ApartmentsRoute
   '/auth': typeof AuthRoute
   '/book': typeof BookRoute
+  '/cancellation': typeof CancellationRoute
   '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
+  '/house-rules': typeof HouseRulesRoute
   '/nearby': typeof NearbyRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/why-choose-us': typeof WhyChooseUsRoute
   '/account': typeof AuthenticatedAccountRouteWithChildren
   '/account/$bookingId': typeof AuthenticatedAccountBookingIdRoute
@@ -203,10 +243,15 @@ export interface FileRoutesById {
   '/apartments': typeof ApartmentsRoute
   '/auth': typeof AuthRoute
   '/book': typeof BookRoute
+  '/cancellation': typeof CancellationRoute
   '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
+  '/house-rules': typeof HouseRulesRoute
   '/nearby': typeof NearbyRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/why-choose-us': typeof WhyChooseUsRoute
   '/_authenticated/account': typeof AuthenticatedAccountRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
@@ -228,10 +273,15 @@ export interface FileRouteTypes {
     | '/apartments'
     | '/auth'
     | '/book'
+    | '/cancellation'
     | '/contact'
+    | '/cookies'
     | '/faq'
     | '/gallery'
+    | '/house-rules'
     | '/nearby'
+    | '/privacy'
+    | '/terms'
     | '/why-choose-us'
     | '/account'
     | '/admin'
@@ -251,10 +301,15 @@ export interface FileRouteTypes {
     | '/apartments'
     | '/auth'
     | '/book'
+    | '/cancellation'
     | '/contact'
+    | '/cookies'
     | '/faq'
     | '/gallery'
+    | '/house-rules'
     | '/nearby'
+    | '/privacy'
+    | '/terms'
     | '/why-choose-us'
     | '/account'
     | '/account/$bookingId'
@@ -274,10 +329,15 @@ export interface FileRouteTypes {
     | '/apartments'
     | '/auth'
     | '/book'
+    | '/cancellation'
     | '/contact'
+    | '/cookies'
     | '/faq'
     | '/gallery'
+    | '/house-rules'
     | '/nearby'
+    | '/privacy'
+    | '/terms'
     | '/why-choose-us'
     | '/_authenticated/account'
     | '/_authenticated/admin'
@@ -299,10 +359,15 @@ export interface RootRouteChildren {
   ApartmentsRoute: typeof ApartmentsRoute
   AuthRoute: typeof AuthRoute
   BookRoute: typeof BookRoute
+  CancellationRoute: typeof CancellationRoute
   ContactRoute: typeof ContactRoute
+  CookiesRoute: typeof CookiesRoute
   FaqRoute: typeof FaqRoute
   GalleryRoute: typeof GalleryRoute
+  HouseRulesRoute: typeof HouseRulesRoute
   NearbyRoute: typeof NearbyRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
   WhyChooseUsRoute: typeof WhyChooseUsRoute
 }
 
@@ -315,11 +380,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WhyChooseUsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/nearby': {
       id: '/nearby'
       path: '/nearby'
       fullPath: '/nearby'
       preLoaderRoute: typeof NearbyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/house-rules': {
+      id: '/house-rules'
+      path: '/house-rules'
+      fullPath: '/house-rules'
+      preLoaderRoute: typeof HouseRulesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gallery': {
@@ -336,11 +422,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cookies': {
+      id: '/cookies'
+      path: '/cookies'
+      fullPath: '/cookies'
+      preLoaderRoute: typeof CookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cancellation': {
+      id: '/cancellation'
+      path: '/cancellation'
+      fullPath: '/cancellation'
+      preLoaderRoute: typeof CancellationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/book': {
@@ -521,22 +621,17 @@ const rootRouteChildren: RootRouteChildren = {
   ApartmentsRoute: ApartmentsRoute,
   AuthRoute: AuthRoute,
   BookRoute: BookRoute,
+  CancellationRoute: CancellationRoute,
   ContactRoute: ContactRoute,
+  CookiesRoute: CookiesRoute,
   FaqRoute: FaqRoute,
   GalleryRoute: GalleryRoute,
+  HouseRulesRoute: HouseRulesRoute,
   NearbyRoute: NearbyRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
   WhyChooseUsRoute: WhyChooseUsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

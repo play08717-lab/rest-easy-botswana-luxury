@@ -14,6 +14,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SidebarNav } from "../components/SidebarNav";
 import { FloatingWhatsApp } from "../components/FloatingWhatsApp";
 import { Footer } from "../components/Footer";
+import { CookieBanner } from "../components/CookieBanner";
+
 
 function NotFoundComponent() {
   return (
@@ -160,6 +162,8 @@ function RootComponent() {
           </div>
         </main>
         <FloatingWhatsApp />
+        <CookieBanner />
+
       </div>
     </QueryClientProvider>
   );
