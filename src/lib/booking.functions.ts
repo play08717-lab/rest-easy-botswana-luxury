@@ -35,6 +35,7 @@ export const searchAvailability = createServerFn({ method: "POST" })
   });
 
 // ---------------- Auth: create booking ----------------
+const consentTrue = z.literal(true, { errorMap: () => ({ message: "Required" }) });
 const createSchema = z.object({
   apartment_id: z.string().uuid(),
   check_in: dateStr,
@@ -45,7 +46,14 @@ const createSchema = z.object({
   guest_phone: z.string().trim().min(5).max(30),
   guest_id_number: z.string().trim().max(60).optional().nullable(),
   special_requests: z.string().trim().max(1000).optional().nullable(),
+  consents: z.object({
+    privacy: consentTrue,
+    terms: consentTrue,
+    cancellation: consentTrue,
+    house_rules: consentTrue,
+  }),
 });
+
 
 export const createBooking = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -112,6 +120,7 @@ export const createBooking = createServerFn({ method: "POST" })
         status: "pending_payment",
         special_requests: data.special_requests ?? null,
         hold_expires_at: holdExpires,
+        consents: { ...data.consents, accepted_at: new Date().toISOString() },
       })
       .select("id, reference")
       .single();
@@ -119,6 +128,7 @@ export const createBooking = createServerFn({ method: "POST" })
 
     return booking;
   });
+
 
 // ---------------- Auth: my bookings ----------------
 export const getMyBookings = createServerFn({ method: "GET" })
