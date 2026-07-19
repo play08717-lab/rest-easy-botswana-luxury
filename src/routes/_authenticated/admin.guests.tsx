@@ -15,17 +15,40 @@ function GuestsPage() {
     queryFn: () => listGuests({ data: { search: search || undefined } }),
   });
 
+  const exportCsv = () => {
+    const rows = data ?? [];
+    if (!rows.length) return;
+    const headers = ["name", "email", "phone", "nationality", "stays", "total_spent", "last_stay"];
+    const csv = [
+      headers.join(","),
+      ...rows.map((r) => headers.map((h) => JSON.stringify((r as Record<string, unknown>)[h] ?? "")).join(",")),
+    ].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = `guests-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
         <h1 className="font-display text-4xl">Guests</h1>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search name, email, phone…"
-          className="bg-dark border border-gold/20 px-4 py-2 text-sm w-72"
-        />
+        <div className="flex gap-2">
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search name, email, phone…"
+            className="bg-dark border border-gold/20 px-4 py-2 text-sm w-72"
+          />
+          <button onClick={exportCsv} className="bg-gold text-dark px-4 py-2 text-[10px] uppercase tracking-[0.2em] font-semibold">
+            Export CSV
+          </button>
+          <button onClick={() => window.print()} className="border border-gold/30 text-paper/70 px-4 py-2 text-[10px] uppercase tracking-[0.2em]">
+            Print / PDF
+          </button>
+        </div>
       </div>
+
 
       {isLoading && <p className="text-paper/50 text-sm">Loading…</p>}
 
