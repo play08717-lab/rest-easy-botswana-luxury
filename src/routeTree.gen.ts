@@ -16,6 +16,7 @@ import { Route as NearbyRouteImport } from './routes/nearby'
 import { Route as HouseRulesRouteImport } from './routes/house-rules'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as DataRequestRouteImport } from './routes/data-request'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CancellationRouteImport } from './routes/cancellation'
@@ -32,6 +33,7 @@ import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as AuthenticatedAdminHousekeepingRouteImport } from './routes/_authenticated/admin.housekeeping'
 import { Route as AuthenticatedAdminGuestsRouteImport } from './routes/_authenticated/admin.guests'
+import { Route as AuthenticatedAdminDataRequestsRouteImport } from './routes/_authenticated/admin.data-requests'
 import { Route as AuthenticatedAdminCalendarRouteImport } from './routes/_authenticated/admin.calendar'
 import { Route as AuthenticatedAdminBookingsRouteImport } from './routes/_authenticated/admin.bookings'
 import { Route as AuthenticatedAdminApartmentsRouteImport } from './routes/_authenticated/admin.apartments'
@@ -70,6 +72,11 @@ const GalleryRoute = GalleryRouteImport.update({
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DataRequestRoute = DataRequestRouteImport.update({
+  id: '/data-request',
+  path: '/data-request',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CookiesRoute = CookiesRouteImport.update({
@@ -155,6 +162,12 @@ const AuthenticatedAdminGuestsRoute =
     path: '/guests',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminDataRequestsRoute =
+  AuthenticatedAdminDataRequestsRouteImport.update({
+    id: '/data-requests',
+    path: '/data-requests',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminCalendarRoute =
   AuthenticatedAdminCalendarRouteImport.update({
     id: '/calendar',
@@ -189,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/cancellation': typeof CancellationRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
+  '/data-request': typeof DataRequestRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
   '/house-rules': typeof HouseRulesRoute
@@ -202,6 +216,7 @@ export interface FileRoutesByFullPath {
   '/admin/apartments': typeof AuthenticatedAdminApartmentsRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
   '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
+  '/admin/data-requests': typeof AuthenticatedAdminDataRequestsRoute
   '/admin/guests': typeof AuthenticatedAdminGuestsRoute
   '/admin/housekeeping': typeof AuthenticatedAdminHousekeepingRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -217,6 +232,7 @@ export interface FileRoutesByTo {
   '/cancellation': typeof CancellationRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
+  '/data-request': typeof DataRequestRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
   '/house-rules': typeof HouseRulesRoute
@@ -229,6 +245,7 @@ export interface FileRoutesByTo {
   '/admin/apartments': typeof AuthenticatedAdminApartmentsRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
   '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
+  '/admin/data-requests': typeof AuthenticatedAdminDataRequestsRoute
   '/admin/guests': typeof AuthenticatedAdminGuestsRoute
   '/admin/housekeeping': typeof AuthenticatedAdminHousekeepingRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -246,6 +263,7 @@ export interface FileRoutesById {
   '/cancellation': typeof CancellationRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
+  '/data-request': typeof DataRequestRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
   '/house-rules': typeof HouseRulesRoute
@@ -259,6 +277,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/apartments': typeof AuthenticatedAdminApartmentsRoute
   '/_authenticated/admin/bookings': typeof AuthenticatedAdminBookingsRoute
   '/_authenticated/admin/calendar': typeof AuthenticatedAdminCalendarRoute
+  '/_authenticated/admin/data-requests': typeof AuthenticatedAdminDataRequestsRoute
   '/_authenticated/admin/guests': typeof AuthenticatedAdminGuestsRoute
   '/_authenticated/admin/housekeeping': typeof AuthenticatedAdminHousekeepingRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -276,6 +295,7 @@ export interface FileRouteTypes {
     | '/cancellation'
     | '/contact'
     | '/cookies'
+    | '/data-request'
     | '/faq'
     | '/gallery'
     | '/house-rules'
@@ -289,6 +309,7 @@ export interface FileRouteTypes {
     | '/admin/apartments'
     | '/admin/bookings'
     | '/admin/calendar'
+    | '/admin/data-requests'
     | '/admin/guests'
     | '/admin/housekeeping'
     | '/admin/reports'
@@ -304,6 +325,7 @@ export interface FileRouteTypes {
     | '/cancellation'
     | '/contact'
     | '/cookies'
+    | '/data-request'
     | '/faq'
     | '/gallery'
     | '/house-rules'
@@ -316,6 +338,7 @@ export interface FileRouteTypes {
     | '/admin/apartments'
     | '/admin/bookings'
     | '/admin/calendar'
+    | '/admin/data-requests'
     | '/admin/guests'
     | '/admin/housekeeping'
     | '/admin/reports'
@@ -332,6 +355,7 @@ export interface FileRouteTypes {
     | '/cancellation'
     | '/contact'
     | '/cookies'
+    | '/data-request'
     | '/faq'
     | '/gallery'
     | '/house-rules'
@@ -345,6 +369,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/apartments'
     | '/_authenticated/admin/bookings'
     | '/_authenticated/admin/calendar'
+    | '/_authenticated/admin/data-requests'
     | '/_authenticated/admin/guests'
     | '/_authenticated/admin/housekeeping'
     | '/_authenticated/admin/reports'
@@ -362,6 +387,7 @@ export interface RootRouteChildren {
   CancellationRoute: typeof CancellationRoute
   ContactRoute: typeof ContactRoute
   CookiesRoute: typeof CookiesRoute
+  DataRequestRoute: typeof DataRequestRoute
   FaqRoute: typeof FaqRoute
   GalleryRoute: typeof GalleryRoute
   HouseRulesRoute: typeof HouseRulesRoute
@@ -420,6 +446,13 @@ declare module '@tanstack/react-router' {
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/data-request': {
+      id: '/data-request'
+      path: '/data-request'
+      fullPath: '/data-request'
+      preLoaderRoute: typeof DataRequestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cookies': {
@@ -534,6 +567,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminGuestsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/data-requests': {
+      id: '/_authenticated/admin/data-requests'
+      path: '/data-requests'
+      fullPath: '/admin/data-requests'
+      preLoaderRoute: typeof AuthenticatedAdminDataRequestsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/calendar': {
       id: '/_authenticated/admin/calendar'
       path: '/calendar'
@@ -580,6 +620,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminApartmentsRoute: typeof AuthenticatedAdminApartmentsRoute
   AuthenticatedAdminBookingsRoute: typeof AuthenticatedAdminBookingsRoute
   AuthenticatedAdminCalendarRoute: typeof AuthenticatedAdminCalendarRoute
+  AuthenticatedAdminDataRequestsRoute: typeof AuthenticatedAdminDataRequestsRoute
   AuthenticatedAdminGuestsRoute: typeof AuthenticatedAdminGuestsRoute
   AuthenticatedAdminHousekeepingRoute: typeof AuthenticatedAdminHousekeepingRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
@@ -591,6 +632,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminApartmentsRoute: AuthenticatedAdminApartmentsRoute,
   AuthenticatedAdminBookingsRoute: AuthenticatedAdminBookingsRoute,
   AuthenticatedAdminCalendarRoute: AuthenticatedAdminCalendarRoute,
+  AuthenticatedAdminDataRequestsRoute: AuthenticatedAdminDataRequestsRoute,
   AuthenticatedAdminGuestsRoute: AuthenticatedAdminGuestsRoute,
   AuthenticatedAdminHousekeepingRoute: AuthenticatedAdminHousekeepingRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
@@ -624,6 +666,7 @@ const rootRouteChildren: RootRouteChildren = {
   CancellationRoute: CancellationRoute,
   ContactRoute: ContactRoute,
   CookiesRoute: CookiesRoute,
+  DataRequestRoute: DataRequestRoute,
   FaqRoute: FaqRoute,
   GalleryRoute: GalleryRoute,
   HouseRulesRoute: HouseRulesRoute,

@@ -6,6 +6,7 @@ const LEGAL = [
   { to: "/cancellation", label: "Cancellation Policy" },
   { to: "/cookies", label: "Cookie Policy" },
   { to: "/house-rules", label: "House Rules" },
+  { to: "/data-request", label: "Data Request" },
 ] as const;
 
 export function Footer() {

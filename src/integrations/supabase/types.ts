@@ -334,6 +334,57 @@ export type Database = {
           },
         ]
       }
+      deletion_requests: {
+        Row: {
+          created_at: string
+          id: string
+          lookup_type: string
+          lookup_value: string
+          matched_booking_ids: string[] | null
+          matched_profile_id: string | null
+          notes: string | null
+          processed_at: string | null
+          processed_by: string | null
+          reason: string | null
+          requester_email: string | null
+          requester_name: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lookup_type: string
+          lookup_value: string
+          matched_booking_ids?: string[] | null
+          matched_profile_id?: string | null
+          notes?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          reason?: string | null
+          requester_email?: string | null
+          requester_name?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lookup_type?: string
+          lookup_value?: string
+          matched_booking_ids?: string[] | null
+          matched_profile_id?: string | null
+          notes?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          reason?: string | null
+          requester_email?: string | null
+          requester_name?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       holidays: {
         Row: {
           created_at: string
