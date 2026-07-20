@@ -106,7 +106,12 @@ export const updateDeletionRequest = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
     if (!isAdmin) throw new Error("Forbidden");
-    const patch: Record<string, unknown> = { status: data.status, notes: data.notes ?? null };
+    const patch: {
+      status: typeof data.status;
+      notes: string | null;
+      processed_by?: string;
+      processed_at?: string;
+    } = { status: data.status, notes: data.notes ?? null };
     if (data.status === "completed" || data.status === "rejected") {
       patch.processed_by = userId;
       patch.processed_at = new Date().toISOString();
@@ -114,11 +119,11 @@ export const updateDeletionRequest = createServerFn({ method: "POST" })
     const { error } = await supabase.from("deletion_requests").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
     await supabase.from("activity_log").insert({
-      user_id: userId,
+      actor_id: userId,
       action: "deletion_request.update",
-      entity: "deletion_requests",
-      entity_id: data.id,
-      metadata: { status: data.status },
+      target_type: "deletion_requests",
+      target_id: data.id,
+      meta: { status: data.status },
     });
     return { ok: true };
   });
