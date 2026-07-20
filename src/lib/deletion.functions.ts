@@ -149,7 +149,7 @@ export const executeDeletion = createServerFn({ method: "POST" })
     const ids: string[] = req.matched_booking_ids ?? [];
     let bookingsRedacted = 0;
     if (ids.length) {
-      const { error, count } = await supabaseAdmin
+      const { error } = await supabaseAdmin
         .from("bookings")
         .update({
           guest_name: "[REDACTED]",
@@ -159,10 +159,10 @@ export const executeDeletion = createServerFn({ method: "POST" })
           vehicle_reg: null,
           notes: null,
           guest_id: null,
-        }, { count: "exact" })
+        })
         .in("id", ids);
       if (error) throw new Error(error.message);
-      bookingsRedacted = count ?? ids.length;
+      bookingsRedacted = ids.length;
     }
     let profileDeleted = false;
     if (req.matched_profile_id) {
@@ -181,11 +181,11 @@ export const executeDeletion = createServerFn({ method: "POST" })
     }).eq("id", data.id);
 
     await supabase.from("activity_log").insert({
-      user_id: userId,
+      actor_id: userId,
       action: "deletion_request.execute",
-      entity: "deletion_requests",
-      entity_id: data.id,
-      metadata: { bookingsRedacted, profileDeleted },
+      target_type: "deletion_requests",
+      target_id: data.id,
+      meta: { bookingsRedacted, profileDeleted },
     });
 
     return { ok: true, bookingsRedacted, profileDeleted };
