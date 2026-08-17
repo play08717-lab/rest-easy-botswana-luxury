@@ -155,7 +155,7 @@ function DataRequestPage() {
               {trackResult.processed_at && (
                 <p><span className="text-paper/50">Processed:</span> {new Date(trackResult.processed_at).toLocaleString()}</p>
               )}
-              {trackResult.notes && <p className="text-paper/70">{trackResult.notes}</p>}
+              <p className="text-paper/50 text-xs">For details about your request, contact us by email quoting this reference.</p>
             </div>
           )}
         </div>

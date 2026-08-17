@@ -69,7 +69,7 @@ export const getDeletionRequestStatus = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: r, error } = await supabaseAdmin
       .from("deletion_requests")
-      .select("id, status, created_at, processed_at, notes, lookup_type, lookup_value")
+      .select("id, status, created_at, processed_at")
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
