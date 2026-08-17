@@ -71,8 +71,9 @@ export const createBooking = createServerFn({ method: "POST" })
     if (!apt || !apt.active) throw new Error("Apartment not available");
     if (data.guests > apt.max_guests) throw new Error("Too many guests for this apartment");
 
-    // Re-check availability atomically via RPC
-    const { data: avail, error: availErr } = await supabase.rpc("search_availability", {
+    // Re-check availability atomically via RPC (privileged: RPC is not client-callable)
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: avail, error: availErr } = await supabaseAdmin.rpc("search_availability", {
       _check_in: data.check_in,
       _check_out: data.check_out,
       _guests: data.guests,
