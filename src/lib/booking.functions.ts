@@ -24,8 +24,8 @@ const searchSchema = z.object({
 export const searchAvailability = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => searchSchema.parse(d))
   .handler(async ({ data }) => {
-    const supabase = serverPublicClient();
-    const { data: rows, error } = await supabase.rpc("search_availability", {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin.rpc("search_availability", {
       _check_in: data.check_in,
       _check_out: data.check_out,
       _guests: data.guests,
