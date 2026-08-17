@@ -1,11 +1,11 @@
-name: Deploy Vite app to GitHub Pages
+- name: Setup Node.js
+  uses: actions/setup-node@v4
+  with:
+    node-version: 20
+    cache: yarn
 
-on:
-  push:
-    branches: ["main"]
-  workflow_dispatch:
-
-permissions:
+- name: Install dependencies
+  run: yarn install
   contents: read
   pages: write
   id-token: write
