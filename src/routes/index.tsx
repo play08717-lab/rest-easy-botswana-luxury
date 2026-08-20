@@ -300,7 +300,14 @@ function Home() {
             <RakopsMap className="h-full" />
           </div>
         </section>
+
+        {/* Availability & rates */}
+        <div className="md:col-span-12 animate-reveal" style={{ animationDelay: "760ms" }}>
+          <AvailabilityChecker title="Check availability & rates" />
+        </div>
       </div>
+
+      <ExploreRakops />
     </div>
   );
 }
