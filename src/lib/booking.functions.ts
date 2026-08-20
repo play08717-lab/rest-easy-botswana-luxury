@@ -383,3 +383,63 @@ export const blockDates = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// ---------------- Public: availability calendar (next N days) ----------------
+export const getAvailabilityCalendar = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({ days: z.number().int().min(7).max(180).default(90) }).parse(d ?? {}))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const start = new Date();
+    start.setUTCHours(0, 0, 0, 0);
+    const end = new Date(start.getTime() + data.days * 86_400_000);
+    const startStr = start.toISOString().slice(0, 10);
+    const endStr = end.toISOString().slice(0, 10);
+
+    const [aptRes, bookRes, blockRes] = await Promise.all([
+      supabaseAdmin
+        .from("apartments")
+        .select("id, slug, name, base_rate_bwp, max_guests")
+        .eq("active", true)
+        .order("base_rate_bwp", { ascending: true }),
+      supabaseAdmin
+        .from("bookings")
+        .select("apartment_id, check_in, check_out, status")
+        .in("status", ["pending_payment", "confirmed", "checked_in"])
+        .lt("check_in", endStr)
+        .gt("check_out", startStr),
+      supabaseAdmin
+        .from("blocked_dates")
+        .select("apartment_id, start_date, end_date")
+        .lt("start_date", endStr)
+        .gt("end_date", startStr),
+    ]);
+    if (aptRes.error) throw new Error(aptRes.error.message);
+
+    const occupied: Record<string, string[]> = {};
+    const addRange = (aptId: string, from: string, to: string) => {
+      const list = (occupied[aptId] ??= []);
+      let cur = new Date(`${from}T00:00:00Z`).getTime();
+      const stop = new Date(`${to}T00:00:00Z`).getTime();
+      const floor = start.getTime();
+      const ceil = end.getTime();
+      while (cur < stop) {
+        if (cur >= floor && cur <= ceil) list.push(new Date(cur).toISOString().slice(0, 10));
+        cur += 86_400_000;
+      }
+    };
+    for (const b of bookRes.data ?? []) addRange(b.apartment_id, b.check_in, b.check_out);
+    for (const b of blockRes.data ?? []) addRange(b.apartment_id, b.start_date, b.end_date);
+
+    return {
+      start: startStr,
+      days: data.days,
+      apartments: (aptRes.data ?? []).map((a) => ({
+        id: a.id,
+        slug: a.slug,
+        name: a.name,
+        base_rate_bwp: Number(a.base_rate_bwp),
+        max_guests: a.max_guests,
+        occupied: Array.from(new Set(occupied[a.id] ?? [])).sort(),
+      })),
+    };
+  });

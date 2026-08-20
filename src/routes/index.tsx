@@ -10,6 +10,8 @@ import roomMaster from "@/assets/room-master.jpg";
 
 import { RakopsMap } from "@/components/RakopsMap";
 import { SectionHeading } from "@/components/SectionHeading";
+import { AvailabilityChecker } from "@/components/AvailabilityChecker";
+import { ExploreRakops } from "@/components/ExploreRakops";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -300,7 +302,14 @@ function Home() {
             <RakopsMap className="h-full" />
           </div>
         </section>
+
+        {/* Availability & rates */}
+        <div className="md:col-span-12 animate-reveal" style={{ animationDelay: "760ms" }}>
+          <AvailabilityChecker title="Check availability & rates" />
+        </div>
       </div>
+
+      <ExploreRakops />
     </div>
   );
 }
