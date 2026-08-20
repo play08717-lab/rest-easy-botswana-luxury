@@ -10,6 +10,8 @@ import roomMaster from "@/assets/room-master.jpg";
 
 import { RakopsMap } from "@/components/RakopsMap";
 import { SectionHeading } from "@/components/SectionHeading";
+import { AvailabilityChecker } from "@/components/AvailabilityChecker";
+import { ExploreRakops } from "@/components/ExploreRakops";
 
 export const Route = createFileRoute("/")({
   head: () => ({

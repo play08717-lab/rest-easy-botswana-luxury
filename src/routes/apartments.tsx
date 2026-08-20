@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHero } from "@/components/PageHero";
 import { ApartmentCard } from "@/components/ApartmentCard";
 import { apartments } from "@/data/apartments";
+import { AvailabilityChecker } from "@/components/AvailabilityChecker";
 
 export const Route = createFileRoute("/apartments")({
   head: () => ({
@@ -39,6 +40,16 @@ function Apartments() {
           <ApartmentCard key={apt.slug} apt={apt} index={i} />
         ))}
       </section>
+
+      <div className="mt-16 md:mt-24 space-y-6">
+        {apartments.map((apt) => (
+          <AvailabilityChecker
+            key={apt.slug}
+            apartmentSlug={apt.slug}
+            title={`${apt.name} — availability & rates`}
+          />
+        ))}
+      </div>
 
       <section className="mt-16 md:mt-24 bg-paper text-dark p-8 md:p-12 grid md:grid-cols-3 gap-8 items-center">
         <div className="md:col-span-2">
