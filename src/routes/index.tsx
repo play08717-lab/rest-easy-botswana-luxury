@@ -12,6 +12,7 @@ import { RakopsMap } from "@/components/RakopsMap";
 import { SectionHeading } from "@/components/SectionHeading";
 import { AvailabilityChecker } from "@/components/AvailabilityChecker";
 import { ExploreRakops } from "@/components/ExploreRakops";
+import { VisitorFaq } from "@/components/VisitorFaq";
 
 export const Route = createFileRoute("/")({
   head: () => ({
