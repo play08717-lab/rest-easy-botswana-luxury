@@ -65,7 +65,7 @@ export const GlobalAssistant: React.FC = () => {
 
   return (
     <>
-      <div className="fixed bottom-6 right-6 z-[9998]">
+      <div className="fixed bottom-24 right-6 z-[9998]">
         <Button
           onClick={() => setIsOpen(!isOpen)}
           className="h-14 w-14 rounded-full bg-gold text-dark hover:bg-gold-light shadow-xl transition-all duration-300 flex items-center justify-center"
@@ -76,7 +76,7 @@ export const GlobalAssistant: React.FC = () => {
       </div>
 
       {isOpen && (
-        <div className="fixed bottom-24 right-4 sm:right-6 w-[calc(100vw-2rem)] sm:w-96 bg-dark text-paper rounded-xl shadow-2xl border border-gold/25 z-[9998] overflow-hidden flex flex-col h-[70vh] max-h-[480px]">
+        <div className="fixed bottom-44 right-4 sm:right-6 w-[calc(100vw-2rem)] sm:w-96 bg-dark text-paper rounded-xl shadow-2xl border border-gold/25 z-[9998] overflow-hidden flex flex-col h-[70vh] max-h-[480px]">
           <div className="p-4 border-b border-gold/20 flex justify-between items-center bg-paper/[0.03]">
             <div className="flex items-center gap-2">
               <div className="p-1.5 bg-gold/15 rounded-lg">
