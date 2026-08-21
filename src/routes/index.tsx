@@ -311,6 +311,7 @@ function Home() {
       </div>
 
       <ExploreRakops />
+      <VisitorFaq />
     </div>
   );
 }
