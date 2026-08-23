@@ -26,6 +26,7 @@ import { Route as ApartmentsRouteImport } from './routes/apartments'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiAssistantRouteImport } from './routes/api/assistant'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -123,6 +124,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAssistantRoute = ApiAssistantRouteImport.update({
+  id: '/api/assistant',
+  path: '/api/assistant',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -212,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/why-choose-us': typeof WhyChooseUsRoute
   '/account': typeof AuthenticatedAccountRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/api/assistant': typeof ApiAssistantRoute
   '/account/$bookingId': typeof AuthenticatedAccountBookingIdRoute
   '/admin/apartments': typeof AuthenticatedAdminApartmentsRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
@@ -241,6 +248,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/why-choose-us': typeof WhyChooseUsRoute
   '/account': typeof AuthenticatedAccountRouteWithChildren
+  '/api/assistant': typeof ApiAssistantRoute
   '/account/$bookingId': typeof AuthenticatedAccountBookingIdRoute
   '/admin/apartments': typeof AuthenticatedAdminApartmentsRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
@@ -273,6 +281,7 @@ export interface FileRoutesById {
   '/why-choose-us': typeof WhyChooseUsRoute
   '/_authenticated/account': typeof AuthenticatedAccountRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/api/assistant': typeof ApiAssistantRoute
   '/_authenticated/account/$bookingId': typeof AuthenticatedAccountBookingIdRoute
   '/_authenticated/admin/apartments': typeof AuthenticatedAdminApartmentsRoute
   '/_authenticated/admin/bookings': typeof AuthenticatedAdminBookingsRoute
@@ -305,6 +314,7 @@ export interface FileRouteTypes {
     | '/why-choose-us'
     | '/account'
     | '/admin'
+    | '/api/assistant'
     | '/account/$bookingId'
     | '/admin/apartments'
     | '/admin/bookings'
@@ -334,6 +344,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/why-choose-us'
     | '/account'
+    | '/api/assistant'
     | '/account/$bookingId'
     | '/admin/apartments'
     | '/admin/bookings'
@@ -365,6 +376,7 @@ export interface FileRouteTypes {
     | '/why-choose-us'
     | '/_authenticated/account'
     | '/_authenticated/admin'
+    | '/api/assistant'
     | '/_authenticated/account/$bookingId'
     | '/_authenticated/admin/apartments'
     | '/_authenticated/admin/bookings'
@@ -395,6 +407,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   WhyChooseUsRoute: typeof WhyChooseUsRoute
+  ApiAssistantRoute: typeof ApiAssistantRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -516,6 +529,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/assistant': {
+      id: '/api/assistant'
+      path: '/api/assistant'
+      fullPath: '/api/assistant'
+      preLoaderRoute: typeof ApiAssistantRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -674,6 +694,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   WhyChooseUsRoute: WhyChooseUsRoute,
+  ApiAssistantRoute: ApiAssistantRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
