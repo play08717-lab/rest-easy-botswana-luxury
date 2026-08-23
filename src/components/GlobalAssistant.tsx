@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { X, Send, Bot, Loader2, CalendarCheck, MapPin, MessageCircle } from 'lucide-react';
+import { useRouter } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -56,6 +57,7 @@ export const GlobalAssistant: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const hydrated = useRef(false);
+  const { navigate } = useRouter();
 
   // Restore this session's conversation.
   useEffect(() => {
