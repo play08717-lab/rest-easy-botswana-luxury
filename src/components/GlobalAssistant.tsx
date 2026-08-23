@@ -210,7 +210,7 @@ export const GlobalAssistant: React.FC = () => {
                   void send(prompt);
                   if (href) {
                     if (external) window.open(href, '_blank', 'noopener,noreferrer');
-                    else window.history.pushState({}, '', href), window.location.assign(href);
+                    else void navigate({ to: href });
                   }
                 }}
                 disabled={isLoading}
