@@ -110,6 +110,42 @@ export type Database = {
         }
         Relationships: []
       }
+      assistant_config: {
+        Row: {
+          advisories_text: string
+          checkin_text: string
+          contact_text: string
+          extra_notes: string
+          id: number
+          location_text: string
+          rates_text: string
+          tone_notes: string
+          updated_at: string
+        }
+        Insert: {
+          advisories_text?: string
+          checkin_text?: string
+          contact_text?: string
+          extra_notes?: string
+          id?: number
+          location_text?: string
+          rates_text?: string
+          tone_notes?: string
+          updated_at?: string
+        }
+        Update: {
+          advisories_text?: string
+          checkin_text?: string
+          contact_text?: string
+          extra_notes?: string
+          id?: number
+          location_text?: string
+          rates_text?: string
+          tone_notes?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blocked_dates: {
         Row: {
           apartment_id: string
