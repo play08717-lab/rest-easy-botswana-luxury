@@ -1,5 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SYSTEM_PROMPT } from "@/lib/assistant-prompt";
+import {
+  DEFAULT_ASSISTANT_CONFIG,
+  buildSystemPrompt,
+  type AssistantConfig,
+} from "@/lib/assistant-prompt";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
@@ -36,6 +40,20 @@ export const Route = createFileRoute("/api/assistant")({
           return new Response("invalid body", { status: 400 });
         }
 
+        // Load the admin-editable concierge details (rates, location, advisories, contact).
+        let systemPrompt = buildSystemPrompt(DEFAULT_ASSISTANT_CONFIG);
+        try {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const { data } = await supabaseAdmin
+            .from("assistant_config")
+            .select("*")
+            .eq("id", 1)
+            .maybeSingle();
+          if (data) systemPrompt = buildSystemPrompt(data as AssistantConfig);
+        } catch (err) {
+          console.error("[assistant] failed to load config, using defaults", err);
+        }
+
         const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
           headers: {
@@ -45,7 +63,7 @@ export const Route = createFileRoute("/api/assistant")({
           body: JSON.stringify({
             model: "google/gemini-3.7-flash",
             stream: true,
-            messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
+            messages: [{ role: "system", content: systemPrompt }, ...messages],
           }),
         });
 
