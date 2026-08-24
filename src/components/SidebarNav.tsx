@@ -3,6 +3,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, X, Phone } from "lucide-react";
 import { useSession, useIsAdmin } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const links = [
   { to: "/", label: "Home" },
