@@ -1,5 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { supabase } from "@/integrations/supabase/client";
+
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -16,6 +18,19 @@ import {
 } from "@/lib/assistant-prompt";
 
 export const Route = createFileRoute("/_authenticated/admin/assistant")({
+  // Super-admin only — managers and other staff are bounced back to the dashboard.
+  beforeLoad: async ({ context }) => {
+    const userId = (context as { user?: { id: string } }).user?.id;
+    if (!userId) throw redirect({ to: "/auth" });
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (error || !data) throw redirect({ to: "/admin" });
+  },
+
   head: () => ({
     meta: [
       { title: "Concierge Settings — Rest Easy Apartment Admin" },

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Phone } from "lucide-react";
 import { useSession, useIsAdmin } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -101,19 +101,29 @@ export function SidebarNav() {
               <Link to="/auth" onClick={() => setOpen(false)} className="text-paper/60 hover:text-gold">Sign in</Link>
             )}
           </div>
-          <a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-3 bg-gold hover:bg-gold-light text-dark py-4 px-6 rounded-sm transition-all duration-300 group"
-          >
-            <span className="text-[11px] font-semibold uppercase tracking-[0.18em]">
-              Book via WhatsApp
-            </span>
-          </a>
+          <div className="flex gap-2">
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-1 items-center justify-center gap-3 bg-gold hover:bg-gold-light text-dark py-4 px-6 rounded-sm transition-all duration-300 group"
+            >
+              <span className="text-[11px] font-semibold uppercase tracking-[0.18em]">
+                Book via WhatsApp
+              </span>
+            </a>
+            <a
+              href="tel:+26771621866"
+              aria-label="Call +267 71 621 866"
+              className="flex items-center justify-center px-4 rounded-sm border border-gold/40 text-gold hover:bg-gold hover:text-dark transition-colors"
+            >
+              <Phone className="w-4 h-4" />
+            </a>
+          </div>
           <p className="text-[10px] text-paper/40 text-center tracking-widest">
             +267 71 621 866
           </p>
+
         </div>
       </nav>
     </>
