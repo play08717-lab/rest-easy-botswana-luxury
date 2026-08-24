@@ -17,13 +17,15 @@ function normalize(input: Partial<Record<keyof AssistantConfig, unknown>>): Assi
   return out;
 }
 
+// Concierge knowledge is super-admin only: managers/receptionists cannot edit it.
 async function assertStaff(context: { supabase: any; userId: string }) {
-  const [{ data: isAdmin }, { data: isManager }] = await Promise.all([
-    context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" }),
-    context.supabase.rpc("has_role", { _user_id: context.userId, _role: "manager" }),
-  ]);
-  if (!isAdmin && !isManager) throw new Error("Forbidden");
+  const { data: isAdmin } = await context.supabase.rpc("has_role", {
+    _user_id: context.userId,
+    _role: "admin",
+  });
+  if (!isAdmin) throw new Error("Forbidden");
 }
+
 
 export const getAssistantConfig = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
