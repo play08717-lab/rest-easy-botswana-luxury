@@ -114,10 +114,18 @@ export function SidebarNav() {
             </a>
             <a
               href="tel:+26771621866"
+              onClick={() =>
+                toast.success("Opening the dialer…", {
+                  description: "Calling Rest Easy Apartment on +267 71 621 866",
+                })
+              }
               aria-label="Call +267 71 621 866"
-              className="flex items-center justify-center px-4 rounded-sm border border-gold/40 text-gold hover:bg-gold hover:text-dark transition-colors"
+              className="flex items-center justify-center gap-2 px-4 rounded-sm border border-gold/40 text-gold hover:bg-gold hover:text-dark transition-colors"
             >
               <Phone className="w-4 h-4" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.18em] hidden sm:inline">
+                Call now
+              </span>
             </a>
           </div>
           <p className="text-[10px] text-paper/40 text-center tracking-widest">
