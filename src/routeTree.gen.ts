@@ -37,6 +37,7 @@ import { Route as AuthenticatedAdminGuestsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminDataRequestsRouteImport } from './routes/_authenticated/admin.data-requests'
 import { Route as AuthenticatedAdminCalendarRouteImport } from './routes/_authenticated/admin.calendar'
 import { Route as AuthenticatedAdminBookingsRouteImport } from './routes/_authenticated/admin.bookings'
+import { Route as AuthenticatedAdminAssistantRouteImport } from './routes/_authenticated/admin.assistant'
 import { Route as AuthenticatedAdminApartmentsRouteImport } from './routes/_authenticated/admin.apartments'
 import { Route as AuthenticatedAccountBookingIdRouteImport } from './routes/_authenticated/account.$bookingId'
 
@@ -186,6 +187,12 @@ const AuthenticatedAdminBookingsRoute =
     path: '/bookings',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAssistantRoute =
+  AuthenticatedAdminAssistantRouteImport.update({
+    id: '/assistant',
+    path: '/assistant',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminApartmentsRoute =
   AuthenticatedAdminApartmentsRouteImport.update({
     id: '/apartments',
@@ -221,6 +228,7 @@ export interface FileRoutesByFullPath {
   '/api/assistant': typeof ApiAssistantRoute
   '/account/$bookingId': typeof AuthenticatedAccountBookingIdRoute
   '/admin/apartments': typeof AuthenticatedAdminApartmentsRoute
+  '/admin/assistant': typeof AuthenticatedAdminAssistantRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
   '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
   '/admin/data-requests': typeof AuthenticatedAdminDataRequestsRoute
@@ -251,6 +259,7 @@ export interface FileRoutesByTo {
   '/api/assistant': typeof ApiAssistantRoute
   '/account/$bookingId': typeof AuthenticatedAccountBookingIdRoute
   '/admin/apartments': typeof AuthenticatedAdminApartmentsRoute
+  '/admin/assistant': typeof AuthenticatedAdminAssistantRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
   '/admin/calendar': typeof AuthenticatedAdminCalendarRoute
   '/admin/data-requests': typeof AuthenticatedAdminDataRequestsRoute
@@ -284,6 +293,7 @@ export interface FileRoutesById {
   '/api/assistant': typeof ApiAssistantRoute
   '/_authenticated/account/$bookingId': typeof AuthenticatedAccountBookingIdRoute
   '/_authenticated/admin/apartments': typeof AuthenticatedAdminApartmentsRoute
+  '/_authenticated/admin/assistant': typeof AuthenticatedAdminAssistantRoute
   '/_authenticated/admin/bookings': typeof AuthenticatedAdminBookingsRoute
   '/_authenticated/admin/calendar': typeof AuthenticatedAdminCalendarRoute
   '/_authenticated/admin/data-requests': typeof AuthenticatedAdminDataRequestsRoute
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
     | '/api/assistant'
     | '/account/$bookingId'
     | '/admin/apartments'
+    | '/admin/assistant'
     | '/admin/bookings'
     | '/admin/calendar'
     | '/admin/data-requests'
@@ -347,6 +358,7 @@ export interface FileRouteTypes {
     | '/api/assistant'
     | '/account/$bookingId'
     | '/admin/apartments'
+    | '/admin/assistant'
     | '/admin/bookings'
     | '/admin/calendar'
     | '/admin/data-requests'
@@ -379,6 +391,7 @@ export interface FileRouteTypes {
     | '/api/assistant'
     | '/_authenticated/account/$bookingId'
     | '/_authenticated/admin/apartments'
+    | '/_authenticated/admin/assistant'
     | '/_authenticated/admin/bookings'
     | '/_authenticated/admin/calendar'
     | '/_authenticated/admin/data-requests'
@@ -608,6 +621,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminBookingsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/assistant': {
+      id: '/_authenticated/admin/assistant'
+      path: '/assistant'
+      fullPath: '/admin/assistant'
+      preLoaderRoute: typeof AuthenticatedAdminAssistantRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/apartments': {
       id: '/_authenticated/admin/apartments'
       path: '/apartments'
@@ -638,6 +658,7 @@ const AuthenticatedAccountRouteWithChildren =
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminApartmentsRoute: typeof AuthenticatedAdminApartmentsRoute
+  AuthenticatedAdminAssistantRoute: typeof AuthenticatedAdminAssistantRoute
   AuthenticatedAdminBookingsRoute: typeof AuthenticatedAdminBookingsRoute
   AuthenticatedAdminCalendarRoute: typeof AuthenticatedAdminCalendarRoute
   AuthenticatedAdminDataRequestsRoute: typeof AuthenticatedAdminDataRequestsRoute
@@ -650,6 +671,7 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminApartmentsRoute: AuthenticatedAdminApartmentsRoute,
+  AuthenticatedAdminAssistantRoute: AuthenticatedAdminAssistantRoute,
   AuthenticatedAdminBookingsRoute: AuthenticatedAdminBookingsRoute,
   AuthenticatedAdminCalendarRoute: AuthenticatedAdminCalendarRoute,
   AuthenticatedAdminDataRequestsRoute: AuthenticatedAdminDataRequestsRoute,

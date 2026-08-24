@@ -16,6 +16,7 @@ import { FloatingWhatsApp } from "../components/FloatingWhatsApp";
 import { Footer } from "../components/Footer";
 import { CookieBanner } from "../components/CookieBanner";
 import { GlobalAssistant } from "../components/GlobalAssistant";
+import { Toaster } from "../components/ui/sonner";
 
 
 function NotFoundComponent() {
@@ -165,6 +166,7 @@ function RootComponent() {
         <FloatingWhatsApp />
         <GlobalAssistant />
         <CookieBanner />
+        <Toaster />
 
       </div>
     </QueryClientProvider>
