@@ -445,6 +445,542 @@ export type Database = {
         }
         Relationships: []
       }
+      lounge_categories: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string
+          id: string
+          name: string
+          sort_order: number
+          updated_at: string
+          venue_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string
+          id?: string
+          name: string
+          sort_order?: number
+          updated_at?: string
+          venue_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          sort_order?: number
+          updated_at?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lounge_categories_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "lounge_venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lounge_item_extras: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          item_id: string
+          name: string
+          price_bwp: number
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          item_id: string
+          name: string
+          price_bwp?: number
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          item_id?: string
+          name?: string
+          price_bwp?: number
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lounge_item_extras_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "lounge_menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lounge_menu_items: {
+        Row: {
+          archived: boolean
+          available: boolean
+          category_id: string | null
+          created_at: string
+          description: string
+          id: string
+          image_url: string
+          is_special: boolean
+          name: string
+          prep_notes: string
+          price_bwp: number
+          sort_order: number
+          updated_at: string
+          venue_id: string
+        }
+        Insert: {
+          archived?: boolean
+          available?: boolean
+          category_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string
+          is_special?: boolean
+          name: string
+          prep_notes?: string
+          price_bwp?: number
+          sort_order?: number
+          updated_at?: string
+          venue_id: string
+        }
+        Update: {
+          archived?: boolean
+          available?: boolean
+          category_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string
+          is_special?: boolean
+          name?: string
+          prep_notes?: string
+          price_bwp?: number
+          sort_order?: number
+          updated_at?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lounge_menu_items_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "lounge_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lounge_menu_items_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "lounge_venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lounge_order_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          id: string
+          note: string | null
+          order_id: string
+          status: Database["public"]["Enums"]["lounge_order_status"]
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          order_id: string
+          status: Database["public"]["Enums"]["lounge_order_status"]
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          order_id?: string
+          status?: Database["public"]["Enums"]["lounge_order_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lounge_order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "lounge_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lounge_order_items: {
+        Row: {
+          category_name: string
+          created_at: string
+          extras: Json
+          extras_total_bwp: number
+          id: string
+          instructions: string | null
+          item_id: string | null
+          item_name: string
+          line_total_bwp: number
+          order_id: string
+          quantity: number
+          unit_price_bwp: number
+        }
+        Insert: {
+          category_name?: string
+          created_at?: string
+          extras?: Json
+          extras_total_bwp?: number
+          id?: string
+          instructions?: string | null
+          item_id?: string | null
+          item_name: string
+          line_total_bwp?: number
+          order_id: string
+          quantity?: number
+          unit_price_bwp?: number
+        }
+        Update: {
+          category_name?: string
+          created_at?: string
+          extras?: Json
+          extras_total_bwp?: number
+          id?: string
+          instructions?: string | null
+          item_id?: string | null
+          item_name?: string
+          line_total_bwp?: number
+          order_id?: string
+          quantity?: number
+          unit_price_bwp?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lounge_order_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "lounge_menu_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lounge_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "lounge_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lounge_orders: {
+        Row: {
+          apartment_id: string | null
+          booking_id: string | null
+          cancelled_at: string | null
+          cancelled_reason: string | null
+          completed_at: string | null
+          confirmed_at: string | null
+          created_at: string
+          customer_email: string | null
+          customer_name: string
+          customer_notes: string | null
+          customer_phone: string
+          delivery_fee_bwp: number
+          delivery_instructions: string | null
+          discount_bwp: number
+          guest_id: string | null
+          id: string
+          order_type: Database["public"]["Enums"]["lounge_order_type"]
+          payment_method: string
+          payment_status: string
+          pickup_time: string | null
+          promo_code: string | null
+          ready_at: string | null
+          reference: string
+          staff_notes: string | null
+          status: Database["public"]["Enums"]["lounge_order_status"]
+          subtotal_bwp: number
+          total_bwp: number
+          updated_at: string
+          venue_id: string
+        }
+        Insert: {
+          apartment_id?: string | null
+          booking_id?: string | null
+          cancelled_at?: string | null
+          cancelled_reason?: string | null
+          completed_at?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name: string
+          customer_notes?: string | null
+          customer_phone: string
+          delivery_fee_bwp?: number
+          delivery_instructions?: string | null
+          discount_bwp?: number
+          guest_id?: string | null
+          id?: string
+          order_type: Database["public"]["Enums"]["lounge_order_type"]
+          payment_method?: string
+          payment_status?: string
+          pickup_time?: string | null
+          promo_code?: string | null
+          ready_at?: string | null
+          reference?: string
+          staff_notes?: string | null
+          status?: Database["public"]["Enums"]["lounge_order_status"]
+          subtotal_bwp?: number
+          total_bwp?: number
+          updated_at?: string
+          venue_id: string
+        }
+        Update: {
+          apartment_id?: string | null
+          booking_id?: string | null
+          cancelled_at?: string | null
+          cancelled_reason?: string | null
+          completed_at?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string
+          customer_notes?: string | null
+          customer_phone?: string
+          delivery_fee_bwp?: number
+          delivery_instructions?: string | null
+          discount_bwp?: number
+          guest_id?: string | null
+          id?: string
+          order_type?: Database["public"]["Enums"]["lounge_order_type"]
+          payment_method?: string
+          payment_status?: string
+          pickup_time?: string | null
+          promo_code?: string | null
+          ready_at?: string | null
+          reference?: string
+          staff_notes?: string | null
+          status?: Database["public"]["Enums"]["lounge_order_status"]
+          subtotal_bwp?: number
+          total_bwp?: number
+          updated_at?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lounge_orders_apartment_id_fkey"
+            columns: ["apartment_id"]
+            isOneToOne: false
+            referencedRelation: "apartments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lounge_orders_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lounge_orders_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "lounge_venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lounge_promotions: {
+        Row: {
+          active: boolean
+          code: string | null
+          created_at: string
+          description: string
+          discount_amount_bwp: number | null
+          discount_percent: number | null
+          ends_at: string | null
+          id: string
+          promo_type: string
+          starts_at: string | null
+          title: string
+          updated_at: string
+          venue_id: string
+        }
+        Insert: {
+          active?: boolean
+          code?: string | null
+          created_at?: string
+          description?: string
+          discount_amount_bwp?: number | null
+          discount_percent?: number | null
+          ends_at?: string | null
+          id?: string
+          promo_type?: string
+          starts_at?: string | null
+          title: string
+          updated_at?: string
+          venue_id: string
+        }
+        Update: {
+          active?: boolean
+          code?: string | null
+          created_at?: string
+          description?: string
+          discount_amount_bwp?: number | null
+          discount_percent?: number | null
+          ends_at?: string | null
+          id?: string
+          promo_type?: string
+          starts_at?: string | null
+          title?: string
+          updated_at?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lounge_promotions_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "lounge_venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lounge_settings: {
+        Row: {
+          address: string
+          cover_image_url: string
+          currency: string
+          delivery_enabled: boolean
+          delivery_fee_bwp: number
+          delivery_instructions: string
+          delivery_radius_km: number
+          distance_note: string
+          email: string
+          estimated_delivery_minutes: number
+          estimated_prep_minutes: number
+          facebook_url: string
+          instagram_url: string
+          logo_url: string
+          maps_embed_url: string
+          maps_url: string
+          minimum_order_bwp: number
+          opening_hours: string
+          payment_methods: string[]
+          phone: string
+          updated_at: string
+          venue_id: string
+          whatsapp_number: string
+        }
+        Insert: {
+          address?: string
+          cover_image_url?: string
+          currency?: string
+          delivery_enabled?: boolean
+          delivery_fee_bwp?: number
+          delivery_instructions?: string
+          delivery_radius_km?: number
+          distance_note?: string
+          email?: string
+          estimated_delivery_minutes?: number
+          estimated_prep_minutes?: number
+          facebook_url?: string
+          instagram_url?: string
+          logo_url?: string
+          maps_embed_url?: string
+          maps_url?: string
+          minimum_order_bwp?: number
+          opening_hours?: string
+          payment_methods?: string[]
+          phone?: string
+          updated_at?: string
+          venue_id: string
+          whatsapp_number?: string
+        }
+        Update: {
+          address?: string
+          cover_image_url?: string
+          currency?: string
+          delivery_enabled?: boolean
+          delivery_fee_bwp?: number
+          delivery_instructions?: string
+          delivery_radius_km?: number
+          distance_note?: string
+          email?: string
+          estimated_delivery_minutes?: number
+          estimated_prep_minutes?: number
+          facebook_url?: string
+          instagram_url?: string
+          logo_url?: string
+          maps_embed_url?: string
+          maps_url?: string
+          minimum_order_bwp?: number
+          opening_hours?: string
+          payment_methods?: string[]
+          phone?: string
+          updated_at?: string
+          venue_id?: string
+          whatsapp_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lounge_settings_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: true
+            referencedRelation: "lounge_venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lounge_venues: {
+        Row: {
+          about: string
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          sort_order: number
+          tagline: string
+          updated_at: string
+        }
+        Insert: {
+          about?: string
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number
+          tagline?: string
+          updated_at?: string
+        }
+        Update: {
+          about?: string
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+          tagline?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           author_id: string | null
@@ -738,6 +1274,7 @@ export type Database = {
     }
     Functions: {
       generate_booking_ref: { Args: never; Returns: string }
+      generate_lounge_order_ref: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -745,6 +1282,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_lounge_manager: { Args: { _user_id: string }; Returns: boolean }
+      is_lounge_staff: { Args: { _user_id: string }; Returns: boolean }
       search_availability: {
         Args: { _check_in: string; _check_out: string; _guests?: number }
         Returns: {
@@ -763,7 +1302,13 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "guest" | "admin" | "receptionist" | "housekeeping" | "manager"
+      app_role:
+        | "guest"
+        | "admin"
+        | "receptionist"
+        | "housekeeping"
+        | "manager"
+        | "lounge_staff"
       booking_status:
         | "pending_payment"
         | "confirmed"
@@ -771,6 +1316,15 @@ export type Database = {
         | "checked_in"
         | "checked_out"
         | "no_show"
+      lounge_order_status:
+        | "received"
+        | "confirmed"
+        | "preparing"
+        | "ready"
+        | "out_for_delivery"
+        | "completed"
+        | "cancelled"
+      lounge_order_type: "pickup" | "delivery"
       message_sender: "guest" | "admin"
       payment_method: "bank_transfer" | "cash" | "other" | "orange_money"
     }
@@ -900,7 +1454,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["guest", "admin", "receptionist", "housekeeping", "manager"],
+      app_role: [
+        "guest",
+        "admin",
+        "receptionist",
+        "housekeeping",
+        "manager",
+        "lounge_staff",
+      ],
       booking_status: [
         "pending_payment",
         "confirmed",
@@ -909,6 +1470,16 @@ export const Constants = {
         "checked_out",
         "no_show",
       ],
+      lounge_order_status: [
+        "received",
+        "confirmed",
+        "preparing",
+        "ready",
+        "out_for_delivery",
+        "completed",
+        "cancelled",
+      ],
+      lounge_order_type: ["pickup", "delivery"],
       message_sender: ["guest", "admin"],
       payment_method: ["bank_transfer", "cash", "other", "orange_money"],
     },
