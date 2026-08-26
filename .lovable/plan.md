@@ -1,69 +1,60 @@
-## Scope
+# Engliton Lounge — food ordering module
 
-Add legal/compliance layer to Rest Easy Apartment: 5 legal pages, booking consent checkboxes (enforced), cookie banner, and admin-side data export + activity audit surfacing. Skip items already in place (HTTPS, password hashing, RLS, activity_log table).
+Add Engliton Lounge as a second business inside the Rest Easy website: its own public pages, digital menu, cart and checkout, order tracking, and a staff order board — all separate from accommodation data, reusing the existing login, roles and design system. Nothing in the accommodation booking system is replaced or removed.
 
-## 1. Legal content pages (public routes)
+Alcohol is excluded from v1: categories ship as food, snacks, desserts, milkshakes, smoothies and soft drinks. Categories are owner-managed, so licensed categories can be added later without code changes.
 
-Create five new routes, each with own SEO head, matching the existing dark/gold Playfair+Poppins design (reuse `PageHero` + typography from `about.tsx`, `faq.tsx`):
+## What the guest / customer sees
 
-- `src/routes/privacy.tsx` — Privacy Policy
-- `src/routes/terms.tsx` — Terms & Conditions
-- `src/routes/cancellation.tsx` — Cancellation & Refund Policy
-- `src/routes/cookies.tsx` — Cookie Policy
-- `src/routes/house-rules.tsx` — House Rules
+New public routes under `/lounge`:
 
-Content: verbatim from the user's message, "Last Updated: July 2026". Shared `LegalSection` component for consistent heading/prose styling.
+- `/lounge` — lounge landing page with its own visual identity (warmer, more social than the accommodation pages), cover image, opening hours, "approximately 3 km from Rest Easy Apartment", Order Now and WhatsApp buttons.
+- `/lounge/menu` — mobile-first digital menu grouped by category, with photos, BWP prices, availability badges, extras and an add-to-cart flow.
+- `/lounge/cart` — quantities, extras, special instructions, subtotal, delivery/service fee, total.
+- `/lounge/checkout` — pick **Pickup from Engliton Lounge** (name, phone, preferred pickup time, notes) or **Rest Easy delivery**, which appears only when the signed-in customer has a current/upcoming booking; they then pick the booking and apartment and add delivery instructions. Payment method is chosen from the methods the owner enabled (cash, bank transfer, Orange Money, card/manual). No card data is ever collected or stored.
+- `/lounge/orders/$reference` — order status page (Received → Confirmed → Preparing → Ready → Out for delivery → Completed / Cancelled), reachable without an account by order reference plus the phone number used on the order.
+- `/lounge/gallery`, `/lounge/about`, `/lounge/contact` (map + directions), and specials surfaced on the landing and menu pages.
 
-## 2. Footer + sidebar links
+On the accommodation side, a "Hungry? Enjoy Engliton Lounge" section is added to the home page and the guest account page, with View Menu / Order Now, clearly stating the lounge is a separate venue about 3 km away. Sidebar gains a Lounge link.
 
-- `src/components/Footer.tsx` — add a Legal column with links to all 5 pages.
-- `src/components/SidebarNav.tsx` — add compact legal links group near bottom (below main nav, above sign-out).
+WhatsApp ordering builds a formatted message (customer, order number, items, quantities, extras, total, pickup/delivery, apartment if applicable, phone, instructions) using the WhatsApp number from Lounge Settings.
 
-## 3. Booking consent enforcement
+## What the owner and staff see
 
-Edit `src/routes/book.tsx`:
-- Add 4 required checkboxes above the Reserve button:
-  - Privacy Policy
-  - Terms & Conditions
-  - Cancellation Policy
-  - House Rules (acknowledged)
-- Each label links to the corresponding page (opens in new tab).
-- Disable Reserve button until all 4 checked; block submit with inline error.
-- Pass `consents: { privacy, terms, cancellation, house_rules, accepted_at }` to `createBooking`.
+New admin area under `/admin/lounge`:
 
-Server side (`src/lib/booking.functions.ts`):
-- Extend `createBooking` input validator to require all 4 booleans true.
-- Persist to `bookings.consents` (jsonb) via new column.
+- **Orders board** — columns Received / Confirmed / Preparing / Ready / Completed, drag-free one-click status advance, order detail drawer with customer contact, WhatsApp reply link, preparation notes, cancel with reason, printable order ticket, and a new-order sound/browser notification via realtime subscription.
+- **Dashboard tiles** — today's orders by status, today's sales, this month's sales, popular items.
+- **Menu manager** — categories and items: add, edit, image upload, price, availability toggle, extras, reorder (sort order), archive, and mark as special.
+- **Promotions** — daily/weekend specials, combo items, discount codes, limited-time offers with start/end dates.
+- **Lounge settings** — name, logo, cover image, phone, WhatsApp, email, address, Google Maps link/coordinates, opening hours, social links, currency (BWP), delivery on/off, delivery fee, minimum order, delivery radius, estimated prep/delivery time, delivery instructions, enabled payment methods.
+- **Lounge reports** — daily/weekly/monthly/annual sales, orders by date, sales by category, best sellers, payment-method summary, cancelled orders, delivery vs pickup, average order value, with CSV export and print-to-PDF.
 
-Migration:
-- `ALTER TABLE public.bookings ADD COLUMN consents jsonb` (nullable for existing rows).
+Access uses the existing roles: admin and manager get everything; receptionist and housekeeping are not given lounge access by default — a new `lounge_staff` role is added for order-board-only access.
 
-## 4. Cookie banner
+## Technical approach
 
-- `src/components/CookieBanner.tsx` — fixed bottom banner shown when `localStorage['rea-cookie-consent']` is unset. Buttons: Accept / Decline, plus link to Cookie Policy. Store choice + timestamp in localStorage. No analytics currently wired, so this is a consent record only.
-- Mount once in `src/routes/__root.tsx` next to `FloatingWhatsApp`.
+New tables, all prefixed `lounge_`, with no changes to accommodation tables:
 
-## 5. Admin: guest data export + audit trail
+- `lounge_venues` (future-proofs multiple venues; v1 seeds one row) and `lounge_settings` (single row per venue: branding, contact, hours, delivery config, enabled payment methods).
+- `lounge_categories` (name, sort_order, active) and `lounge_menu_items` (category, name, description, price_bwp, image_url, available, sort_order, prep_notes, is_special, archived).
+- `lounge_item_extras` (item, name, price_bwp, active).
+- `lounge_promotions` (type, code, value, starts_at, ends_at, active).
+- `lounge_orders` (reference `EL-#####` from a sequence, order_type pickup|delivery, status enum, customer_name/phone/email, optional `guest_id`, optional `booking_id` and `apartment_id` for guest delivery, subtotal/fee/discount/total, payment_method, payment_status, notes, staff prep notes, timestamps per status) and `lounge_order_items` (order, item snapshot name/price, qty, extras snapshot, instructions).
+- `lounge_order_events` for the status audit trail.
 
-Extend admin without new modules:
+Security: every table gets GRANTs plus RLS. Public/anon gets read-only SELECT on active categories, available items, extras, active promotions and public settings columns only. Order creation goes through a server function that validates prices server-side (never trusting client totals) and verifies any claimed booking belongs to the signed-in user. Customers read their own orders via `guest_id`; anonymous customers read a single order through a server function that requires reference + matching phone. Staff read/write is gated by `has_role`. Menu images use a new public storage bucket with staff-only writes.
 
-- `src/routes/_authenticated/admin.guests.tsx` — add a "Export CSV" button (all guests) and a per-guest "Export PDF" (print view of profile + bookings) using the same CSV pattern from `admin.reports.tsx` and `window.print()`.
-- `src/routes/_authenticated/admin.bookings.tsx` — add a "View history" link per booking that opens a small dialog listing `activity_log` rows for that booking (who / when / action). New server fn `getBookingAuditTrail` in `admin.functions.ts`.
-- Add "Delete guest data" action on guest detail (admin only, confirms) — new server fn `deleteGuestData` that nullifies PII on completed bookings (keeps financial record) and removes the profile row. Logs to `activity_log`.
+Server logic in `src/lib/lounge.functions.ts` (public menu/order fns) and `src/lib/lounge-admin.functions.ts` (staff CRUD, board, reports), following the existing `requireSupabaseAuth` + `has_role` pattern. Order references come from a Postgres sequence, mirroring `generate_booking_ref`.
 
-## 6. Session hygiene
+Each new route gets its own `head()` metadata for SEO and sharing.
 
-- `src/hooks/use-session.ts` — add an idle-timeout hook (`useIdleLogout`, 30 min) that calls `supabase.auth.signOut()` and redirects to `/auth`. Mount inside `_authenticated/route.tsx` so it only runs for signed-in users.
+## Build order
 
-## Out of scope (already in place or previously deferred)
+1. Migration: venues, settings, categories, items, extras, promotions, orders, order items, events, sequence, grants, RLS, storage bucket, seed of one venue + starter categories and a few placeholder menu items.
+2. Server functions: public menu + settings reads, order creation with server-side pricing, order status lookup.
+3. Public lounge pages: landing, menu, cart (client cart state persisted in localStorage), checkout, order status.
+4. Admin: settings, menu manager, promotions, order board with realtime + notification, reports with CSV export.
+5. Rest Easy cross-promotion section, sidebar link, and guest-account "Order food" entry.
 
-- HTTPS, password hashing, RLS, role-based access, booking activity logs table — already implemented.
-- Automated database backups — managed by Lovable Cloud; documented in Privacy Policy copy, no code change.
-- Multi-tenant "customizable for future clients" templating — legal copy is plain JSX and can be swapped per project; no CMS.
-
-## Technical notes
-
-- All new routes are public, top-level, SSR-on, with unique `head()` metadata (title + description + og tags).
-- Consent persistence uses a new nullable `jsonb` column; no breaking change to existing bookings.
-- CSV export reuses the existing client-side blob pattern (no new deps).
-- Idle logout uses `visibilitychange` + `mousemove`/`keydown` listeners; pure client.
+Placeholder food photography is generated for the seeded menu items until real photos are supplied.
