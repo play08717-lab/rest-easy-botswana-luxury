@@ -280,24 +280,29 @@ async function loadVenue(admin: Admin) {
   return { venueId: venue.id, settings };
 }
 
+type OrderInsert = import("@/integrations/supabase/types").Database["public"]["Tables"]["lounge_orders"]["Insert"];
+
 async function insertOrder(
   admin: Admin,
   venueId: string,
-  payload: Record<string, unknown>,
+  payload: Partial<OrderInsert>,
   priced: Awaited<ReturnType<typeof priceOrder>>,
 ) {
+  const insertRow = {
+    venue_id: venueId,
+    subtotal_bwp: priced.subtotal,
+    delivery_fee_bwp: priced.deliveryFee,
+    discount_bwp: priced.discount,
+    total_bwp: priced.total,
+    promo_code: priced.appliedCode,
+    ...payload,
+  } as OrderInsert;
+
   const { data: order, error } = await admin
     .from("lounge_orders")
-    .insert({
-      venue_id: venueId,
-      subtotal_bwp: priced.subtotal,
-      delivery_fee_bwp: priced.deliveryFee,
-      discount_bwp: priced.discount,
-      total_bwp: priced.total,
-      promo_code: priced.appliedCode,
-      ...payload,
-    })
+    .insert(insertRow)
     .select("id, reference, status, total_bwp, order_type, created_at")
+
     .single();
   if (error) throw new Error(error.message);
 
