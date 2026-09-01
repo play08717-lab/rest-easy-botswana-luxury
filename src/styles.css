@@ -35,6 +35,9 @@
   --color-gold: var(--gold);
   --color-gold-light: var(--gold-light);
   --color-whatsapp: var(--whatsapp);
+  --color-ember: var(--ember);
+  --color-ember-light: var(--ember-light);
+  --color-ember-deep: var(--ember-deep);
 
   --font-display: "Playfair Display", ui-serif, Georgia, serif;
   --font-body: "Poppins", ui-sans-serif, system-ui, sans-serif;
@@ -51,6 +54,9 @@
   --gold: #c9a24c;
   --gold-light: #e8c87a;
   --whatsapp: #25d366;
+  --ember: #d9642f;
+  --ember-light: #f08a4b;
+  --ember-deep: #17100c;
 
   --background: #0a0a0a;
   --foreground: #f7f4ee;

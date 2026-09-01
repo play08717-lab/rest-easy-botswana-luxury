@@ -13,6 +13,7 @@ import { Route as WhyChooseUsRouteImport } from './routes/why-choose-us'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as NearbyRouteImport } from './routes/nearby'
+import { Route as LoungeRouteImport } from './routes/lounge'
 import { Route as HouseRulesRouteImport } from './routes/house-rules'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as FaqRouteImport } from './routes/faq'
@@ -59,6 +60,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const NearbyRoute = NearbyRouteImport.update({
   id: '/nearby',
   path: '/nearby',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoungeRoute = LoungeRouteImport.update({
+  id: '/lounge',
+  path: '/lounge',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HouseRulesRoute = HouseRulesRouteImport.update({
@@ -219,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
   '/house-rules': typeof HouseRulesRoute
+  '/lounge': typeof LoungeRoute
   '/nearby': typeof NearbyRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -251,6 +258,7 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
   '/house-rules': typeof HouseRulesRoute
+  '/lounge': typeof LoungeRoute
   '/nearby': typeof NearbyRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -284,6 +292,7 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
   '/house-rules': typeof HouseRulesRoute
+  '/lounge': typeof LoungeRoute
   '/nearby': typeof NearbyRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -318,6 +327,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/gallery'
     | '/house-rules'
+    | '/lounge'
     | '/nearby'
     | '/privacy'
     | '/terms'
@@ -350,6 +360,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/gallery'
     | '/house-rules'
+    | '/lounge'
     | '/nearby'
     | '/privacy'
     | '/terms'
@@ -382,6 +393,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/gallery'
     | '/house-rules'
+    | '/lounge'
     | '/nearby'
     | '/privacy'
     | '/terms'
@@ -416,6 +428,7 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   GalleryRoute: typeof GalleryRoute
   HouseRulesRoute: typeof HouseRulesRoute
+  LoungeRoute: typeof LoungeRoute
   NearbyRoute: typeof NearbyRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
@@ -451,6 +464,13 @@ declare module '@tanstack/react-router' {
       path: '/nearby'
       fullPath: '/nearby'
       preLoaderRoute: typeof NearbyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lounge': {
+      id: '/lounge'
+      path: '/lounge'
+      fullPath: '/lounge'
+      preLoaderRoute: typeof LoungeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/house-rules': {
@@ -712,6 +732,7 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   GalleryRoute: GalleryRoute,
   HouseRulesRoute: HouseRulesRoute,
+  LoungeRoute: LoungeRoute,
   NearbyRoute: NearbyRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,

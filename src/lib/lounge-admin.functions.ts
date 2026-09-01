@@ -75,6 +75,15 @@ export const getLoungeBoard = createServerFn({ method: "GET" })
           .in("order_id", ids)
       : { data: [] as Array<{ order_id: string; item_name: string; quantity: number; extras: unknown; instructions: string | null; line_total_bwp: number }> };
 
+    const orderItems = (itemsRes.data ?? []).map((i) => ({
+      order_id: i.order_id,
+      item_name: i.item_name,
+      quantity: i.quantity,
+      instructions: i.instructions,
+      line_total_bwp: Number(i.line_total_bwp),
+      extras: (Array.isArray(i.extras) ? i.extras : []) as Array<{ name: string; price_bwp: number }>,
+    }));
+
     const today = todayRes.data ?? [];
     const month = monthRes.data ?? [];
     const paidish = (s: string) => s !== "cancelled";
@@ -95,7 +104,7 @@ export const getLoungeBoard = createServerFn({ method: "GET" })
         apartment_name:
           (o as unknown as { apartments: { name: string; apartment_number: string | null } | null }).apartments?.name ??
           null,
-        items: (itemsRes.data ?? []).filter((i) => i.order_id === o.id),
+        items: orderItems.filter((i) => i.order_id === o.id),
       })),
       kpis: {
         today_orders: today.length,
