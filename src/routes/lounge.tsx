@@ -22,12 +22,13 @@ export const Route = createFileRoute("/lounge")({
   notFoundComponent: () => <p className="py-20 text-center text-paper/60">That lounge page doesn't exist.</p>,
 });
 
-const tabs = [
+const tabs: Array<{ to: "/lounge" | "/lounge/menu" | "/lounge/checkout" | "/lounge/order"; label: string; exact?: boolean }> = [
   { to: "/lounge", label: "Lounge", exact: true },
   { to: "/lounge/menu", label: "Menu" },
   { to: "/lounge/checkout", label: "Checkout" },
   { to: "/lounge/order", label: "Track order" },
-] as const;
+];
+
 
 function LoungeLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
