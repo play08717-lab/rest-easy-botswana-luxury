@@ -29,6 +29,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoungeIndexRouteImport } from './routes/lounge.index'
 import { Route as LoungeMenuRouteImport } from './routes/lounge.menu'
+import { Route as LoungeCheckoutRouteImport } from './routes/lounge.checkout'
 import { Route as ApiAssistantRouteImport } from './routes/api/assistant'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
@@ -143,6 +144,11 @@ const LoungeMenuRoute = LoungeMenuRouteImport.update({
   path: '/menu',
   getParentRoute: () => LoungeRoute,
 } as any)
+const LoungeCheckoutRoute = LoungeCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => LoungeRoute,
+} as any)
 const ApiAssistantRoute = ApiAssistantRouteImport.update({
   id: '/api/assistant',
   path: '/api/assistant',
@@ -245,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AuthenticatedAccountRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/assistant': typeof ApiAssistantRoute
+  '/lounge/checkout': typeof LoungeCheckoutRoute
   '/lounge/menu': typeof LoungeMenuRoute
   '/lounge/': typeof LoungeIndexRoute
   '/account/$bookingId': typeof AuthenticatedAccountBookingIdRoute
@@ -278,6 +285,7 @@ export interface FileRoutesByTo {
   '/why-choose-us': typeof WhyChooseUsRoute
   '/account': typeof AuthenticatedAccountRouteWithChildren
   '/api/assistant': typeof ApiAssistantRoute
+  '/lounge/checkout': typeof LoungeCheckoutRoute
   '/lounge/menu': typeof LoungeMenuRoute
   '/lounge': typeof LoungeIndexRoute
   '/account/$bookingId': typeof AuthenticatedAccountBookingIdRoute
@@ -315,6 +323,7 @@ export interface FileRoutesById {
   '/_authenticated/account': typeof AuthenticatedAccountRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/assistant': typeof ApiAssistantRoute
+  '/lounge/checkout': typeof LoungeCheckoutRoute
   '/lounge/menu': typeof LoungeMenuRoute
   '/lounge/': typeof LoungeIndexRoute
   '/_authenticated/account/$bookingId': typeof AuthenticatedAccountBookingIdRoute
@@ -352,6 +361,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/api/assistant'
+    | '/lounge/checkout'
     | '/lounge/menu'
     | '/lounge/'
     | '/account/$bookingId'
@@ -385,6 +395,7 @@ export interface FileRouteTypes {
     | '/why-choose-us'
     | '/account'
     | '/api/assistant'
+    | '/lounge/checkout'
     | '/lounge/menu'
     | '/lounge'
     | '/account/$bookingId'
@@ -421,6 +432,7 @@ export interface FileRouteTypes {
     | '/_authenticated/account'
     | '/_authenticated/admin'
     | '/api/assistant'
+    | '/lounge/checkout'
     | '/lounge/menu'
     | '/lounge/'
     | '/_authenticated/account/$bookingId'
@@ -600,6 +612,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoungeMenuRouteImport
       parentRoute: typeof LoungeRoute
     }
+    '/lounge/checkout': {
+      id: '/lounge/checkout'
+      path: '/checkout'
+      fullPath: '/lounge/checkout'
+      preLoaderRoute: typeof LoungeCheckoutRouteImport
+      parentRoute: typeof LoungeRoute
+    }
     '/api/assistant': {
       id: '/api/assistant'
       path: '/api/assistant'
@@ -755,11 +774,13 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface LoungeRouteChildren {
+  LoungeCheckoutRoute: typeof LoungeCheckoutRoute
   LoungeMenuRoute: typeof LoungeMenuRoute
   LoungeIndexRoute: typeof LoungeIndexRoute
 }
 
 const LoungeRouteChildren: LoungeRouteChildren = {
+  LoungeCheckoutRoute: LoungeCheckoutRoute,
   LoungeMenuRoute: LoungeMenuRoute,
   LoungeIndexRoute: LoungeIndexRoute,
 }
