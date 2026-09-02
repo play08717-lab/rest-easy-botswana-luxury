@@ -27,6 +27,10 @@ import { Route as ApartmentsRouteImport } from './routes/apartments'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoungeIndexRouteImport } from './routes/lounge.index'
+import { Route as LoungeOrderRouteImport } from './routes/lounge.order'
+import { Route as LoungeMenuRouteImport } from './routes/lounge.menu'
+import { Route as LoungeCheckoutRouteImport } from './routes/lounge.checkout'
 import { Route as ApiAssistantRouteImport } from './routes/api/assistant'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
@@ -131,6 +135,26 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoungeIndexRoute = LoungeIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LoungeRoute,
+} as any)
+const LoungeOrderRoute = LoungeOrderRouteImport.update({
+  id: '/order',
+  path: '/order',
+  getParentRoute: () => LoungeRoute,
+} as any)
+const LoungeMenuRoute = LoungeMenuRouteImport.update({
+  id: '/menu',
+  path: '/menu',
+  getParentRoute: () => LoungeRoute,
+} as any)
+const LoungeCheckoutRoute = LoungeCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => LoungeRoute,
+} as any)
 const ApiAssistantRoute = ApiAssistantRouteImport.update({
   id: '/api/assistant',
   path: '/api/assistant',
@@ -225,7 +249,7 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
   '/house-rules': typeof HouseRulesRoute
-  '/lounge': typeof LoungeRoute
+  '/lounge': typeof LoungeRouteWithChildren
   '/nearby': typeof NearbyRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -233,6 +257,10 @@ export interface FileRoutesByFullPath {
   '/account': typeof AuthenticatedAccountRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/assistant': typeof ApiAssistantRoute
+  '/lounge/checkout': typeof LoungeCheckoutRoute
+  '/lounge/menu': typeof LoungeMenuRoute
+  '/lounge/order': typeof LoungeOrderRoute
+  '/lounge/': typeof LoungeIndexRoute
   '/account/$bookingId': typeof AuthenticatedAccountBookingIdRoute
   '/admin/apartments': typeof AuthenticatedAdminApartmentsRoute
   '/admin/assistant': typeof AuthenticatedAdminAssistantRoute
@@ -258,13 +286,16 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
   '/house-rules': typeof HouseRulesRoute
-  '/lounge': typeof LoungeRoute
   '/nearby': typeof NearbyRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/why-choose-us': typeof WhyChooseUsRoute
   '/account': typeof AuthenticatedAccountRouteWithChildren
   '/api/assistant': typeof ApiAssistantRoute
+  '/lounge/checkout': typeof LoungeCheckoutRoute
+  '/lounge/menu': typeof LoungeMenuRoute
+  '/lounge/order': typeof LoungeOrderRoute
+  '/lounge': typeof LoungeIndexRoute
   '/account/$bookingId': typeof AuthenticatedAccountBookingIdRoute
   '/admin/apartments': typeof AuthenticatedAdminApartmentsRoute
   '/admin/assistant': typeof AuthenticatedAdminAssistantRoute
@@ -292,7 +323,7 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
   '/house-rules': typeof HouseRulesRoute
-  '/lounge': typeof LoungeRoute
+  '/lounge': typeof LoungeRouteWithChildren
   '/nearby': typeof NearbyRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -300,6 +331,10 @@ export interface FileRoutesById {
   '/_authenticated/account': typeof AuthenticatedAccountRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/api/assistant': typeof ApiAssistantRoute
+  '/lounge/checkout': typeof LoungeCheckoutRoute
+  '/lounge/menu': typeof LoungeMenuRoute
+  '/lounge/order': typeof LoungeOrderRoute
+  '/lounge/': typeof LoungeIndexRoute
   '/_authenticated/account/$bookingId': typeof AuthenticatedAccountBookingIdRoute
   '/_authenticated/admin/apartments': typeof AuthenticatedAdminApartmentsRoute
   '/_authenticated/admin/assistant': typeof AuthenticatedAdminAssistantRoute
@@ -335,6 +370,10 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/api/assistant'
+    | '/lounge/checkout'
+    | '/lounge/menu'
+    | '/lounge/order'
+    | '/lounge/'
     | '/account/$bookingId'
     | '/admin/apartments'
     | '/admin/assistant'
@@ -360,13 +399,16 @@ export interface FileRouteTypes {
     | '/faq'
     | '/gallery'
     | '/house-rules'
-    | '/lounge'
     | '/nearby'
     | '/privacy'
     | '/terms'
     | '/why-choose-us'
     | '/account'
     | '/api/assistant'
+    | '/lounge/checkout'
+    | '/lounge/menu'
+    | '/lounge/order'
+    | '/lounge'
     | '/account/$bookingId'
     | '/admin/apartments'
     | '/admin/assistant'
@@ -401,6 +443,10 @@ export interface FileRouteTypes {
     | '/_authenticated/account'
     | '/_authenticated/admin'
     | '/api/assistant'
+    | '/lounge/checkout'
+    | '/lounge/menu'
+    | '/lounge/order'
+    | '/lounge/'
     | '/_authenticated/account/$bookingId'
     | '/_authenticated/admin/apartments'
     | '/_authenticated/admin/assistant'
@@ -428,7 +474,7 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   GalleryRoute: typeof GalleryRoute
   HouseRulesRoute: typeof HouseRulesRoute
-  LoungeRoute: typeof LoungeRoute
+  LoungeRoute: typeof LoungeRouteWithChildren
   NearbyRoute: typeof NearbyRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
@@ -563,6 +609,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/lounge/': {
+      id: '/lounge/'
+      path: '/'
+      fullPath: '/lounge/'
+      preLoaderRoute: typeof LoungeIndexRouteImport
+      parentRoute: typeof LoungeRoute
+    }
+    '/lounge/order': {
+      id: '/lounge/order'
+      path: '/order'
+      fullPath: '/lounge/order'
+      preLoaderRoute: typeof LoungeOrderRouteImport
+      parentRoute: typeof LoungeRoute
+    }
+    '/lounge/menu': {
+      id: '/lounge/menu'
+      path: '/menu'
+      fullPath: '/lounge/menu'
+      preLoaderRoute: typeof LoungeMenuRouteImport
+      parentRoute: typeof LoungeRoute
+    }
+    '/lounge/checkout': {
+      id: '/lounge/checkout'
+      path: '/checkout'
+      fullPath: '/lounge/checkout'
+      preLoaderRoute: typeof LoungeCheckoutRouteImport
+      parentRoute: typeof LoungeRoute
     }
     '/api/assistant': {
       id: '/api/assistant'
@@ -718,6 +792,23 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface LoungeRouteChildren {
+  LoungeCheckoutRoute: typeof LoungeCheckoutRoute
+  LoungeMenuRoute: typeof LoungeMenuRoute
+  LoungeOrderRoute: typeof LoungeOrderRoute
+  LoungeIndexRoute: typeof LoungeIndexRoute
+}
+
+const LoungeRouteChildren: LoungeRouteChildren = {
+  LoungeCheckoutRoute: LoungeCheckoutRoute,
+  LoungeMenuRoute: LoungeMenuRoute,
+  LoungeOrderRoute: LoungeOrderRoute,
+  LoungeIndexRoute: LoungeIndexRoute,
+}
+
+const LoungeRouteWithChildren =
+  LoungeRoute._addFileChildren(LoungeRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -732,7 +823,7 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   GalleryRoute: GalleryRoute,
   HouseRulesRoute: HouseRulesRoute,
-  LoungeRoute: LoungeRoute,
+  LoungeRoute: LoungeRouteWithChildren,
   NearbyRoute: NearbyRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
