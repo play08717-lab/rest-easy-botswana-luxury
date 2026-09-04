@@ -47,6 +47,7 @@ import { Route as AuthenticatedAdminAssistantRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminApartmentsRouteImport } from './routes/_authenticated/admin.apartments'
 import { Route as AuthenticatedAccountBookingIdRouteImport } from './routes/_authenticated/account.$bookingId'
 import { Route as AuthenticatedAdminLoungeIndexRouteImport } from './routes/_authenticated/admin.lounge.index'
+import { Route as AuthenticatedAdminLoungeMenuRouteImport } from './routes/_authenticated/admin.lounge.menu'
 
 const WhyChooseUsRoute = WhyChooseUsRouteImport.update({
   id: '/why-choose-us',
@@ -249,6 +250,12 @@ const AuthenticatedAdminLoungeIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAdminLoungeRoute,
   } as any)
+const AuthenticatedAdminLoungeMenuRoute =
+  AuthenticatedAdminLoungeMenuRouteImport.update({
+    id: '/menu',
+    path: '/menu',
+    getParentRoute: () => AuthenticatedAdminLoungeRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -287,6 +294,7 @@ export interface FileRoutesByFullPath {
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/lounge/menu': typeof AuthenticatedAdminLoungeMenuRoute
   '/admin/lounge/': typeof AuthenticatedAdminLoungeIndexRoute
 }
 export interface FileRoutesByTo {
@@ -323,6 +331,7 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/lounge/menu': typeof AuthenticatedAdminLoungeMenuRoute
   '/admin/lounge': typeof AuthenticatedAdminLoungeIndexRoute
 }
 export interface FileRoutesById {
@@ -364,6 +373,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/lounge/menu': typeof AuthenticatedAdminLoungeMenuRoute
   '/_authenticated/admin/lounge/': typeof AuthenticatedAdminLoungeIndexRoute
 }
 export interface FileRouteTypes {
@@ -405,6 +415,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/'
+    | '/admin/lounge/menu'
     | '/admin/lounge/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -441,6 +452,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/settings'
     | '/admin'
+    | '/admin/lounge/menu'
     | '/admin/lounge'
   id:
     | '__root__'
@@ -481,6 +493,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/reports'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/lounge/menu'
     | '/_authenticated/admin/lounge/'
   fileRoutesById: FileRoutesById
 }
@@ -774,6 +787,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminLoungeIndexRouteImport
       parentRoute: typeof AuthenticatedAdminLoungeRoute
     }
+    '/_authenticated/admin/lounge/menu': {
+      id: '/_authenticated/admin/lounge/menu'
+      path: '/menu'
+      fullPath: '/admin/lounge/menu'
+      preLoaderRoute: typeof AuthenticatedAdminLoungeMenuRouteImport
+      parentRoute: typeof AuthenticatedAdminLoungeRoute
+    }
   }
 }
 
@@ -789,11 +809,13 @@ const AuthenticatedAccountRouteWithChildren =
   AuthenticatedAccountRoute._addFileChildren(AuthenticatedAccountRouteChildren)
 
 interface AuthenticatedAdminLoungeRouteChildren {
+  AuthenticatedAdminLoungeMenuRoute: typeof AuthenticatedAdminLoungeMenuRoute
   AuthenticatedAdminLoungeIndexRoute: typeof AuthenticatedAdminLoungeIndexRoute
 }
 
 const AuthenticatedAdminLoungeRouteChildren: AuthenticatedAdminLoungeRouteChildren =
   {
+    AuthenticatedAdminLoungeMenuRoute: AuthenticatedAdminLoungeMenuRoute,
     AuthenticatedAdminLoungeIndexRoute: AuthenticatedAdminLoungeIndexRoute,
   }
 
