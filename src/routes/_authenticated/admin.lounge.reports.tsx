@@ -30,12 +30,15 @@ function LoungeReports() {
 
   function exportCsv() {
     if (!data) return;
-    const rows: string[] = ["Section,Label,Orders,Revenue (BWP)"];
-    data.by_day.forEach((d) => rows.push(`Day,${d.date},${d.orders},${d.revenue.toFixed(2)}`));
-    data.by_category.forEach((c) => rows.push(`Category,"${c.name}",${c.qty},${c.revenue.toFixed(2)}`));
-    data.by_item.forEach((i) => rows.push(`Item,"${i.name}",${i.qty},${i.revenue.toFixed(2)}`));
+    const rows: string[] = ["Section,Label,Count,Sales (BWP)"];
+    data.by_day.forEach((d) => rows.push(`Day,${d.day},${d.orders},${d.sales.toFixed(2)}`));
+    data.by_category.forEach((c) => rows.push(`Category,"${c.key}",${c.qty},${c.sales.toFixed(2)}`));
+    data.by_item.forEach((i) => rows.push(`Item,"${i.key}",${i.qty},${i.sales.toFixed(2)}`));
     data.by_payment.forEach((p) =>
-      rows.push(`Payment,"${PAYMENT_LABELS[p.method] ?? p.method}",${p.orders},${p.revenue.toFixed(2)}`),
+      rows.push(`Payment,"${PAYMENT_LABELS[p.key] ?? p.key}",${p.qty},${p.sales.toFixed(2)}`),
+    );
+    data.orders_list.forEach((o) =>
+      rows.push(`Order,"${o.reference} ${o.date} ${o.status} ${o.type}",1,${o.total.toFixed(2)}`),
     );
     const blob = new Blob([rows.join("\n")], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -48,14 +51,14 @@ function LoungeReports() {
 
   if (error) return <p className="text-red-400">{(error as Error).message}</p>;
 
-  const maxDay = Math.max(1, ...(data?.by_day ?? []).map((d) => d.revenue));
+  const maxDay = Math.max(1, ...(data?.by_day ?? []).map((d) => d.sales));
 
   return (
     <div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-4xl">Sales reports</h1>
-          <p className="mt-2 text-sm text-paper/55">Completed orders only, in Pula.</p>
+          <p className="mt-2 text-sm text-paper/55">Cancelled orders are excluded from sales totals.</p>
         </div>
         <button
           type="button"
@@ -89,28 +92,30 @@ function LoungeReports() {
 
       {isLoading && <p className="mt-8 text-sm text-paper/50">Crunching numbers…</p>}
 
-      <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Kpi label="Revenue" value={bwp(data?.totals.revenue ?? 0)} />
-        <Kpi label="Orders" value={String(data?.totals.orders ?? 0)} />
-        <Kpi label="Average order" value={bwp(data?.totals.average ?? 0)} />
-        <Kpi label="Delivery fees" value={bwp(data?.totals.delivery_fees ?? 0)} />
+      <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        <Kpi label="Sales" value={bwp(data?.summary.sales ?? 0)} />
+        <Kpi label="Orders" value={String(data?.summary.orders ?? 0)} />
+        <Kpi label="Average order" value={bwp(data?.summary.average_order ?? 0)} />
+        <Kpi label="Delivery" value={String(data?.summary.delivery ?? 0)} />
+        <Kpi label="Collection" value={String(data?.summary.pickup ?? 0)} />
+        <Kpi label="Cancelled" value={String(data?.summary.cancelled ?? 0)} />
       </div>
 
       <section className="mt-12">
-        <h2 className="text-[11px] uppercase tracking-[0.25em] text-paper/45">Revenue by day</h2>
+        <h2 className="text-[11px] uppercase tracking-[0.25em] text-paper/45">Sales by day</h2>
         <div className="mt-4 space-y-2">
           {(data?.by_day ?? []).map((d) => (
-            <div key={d.date} className="flex items-center gap-3 text-xs">
-              <span className="w-24 text-paper/50">{d.date}</span>
+            <div key={d.day} className="flex items-center gap-3 text-xs">
+              <span className="w-24 text-paper/50">{d.day}</span>
               <div className="h-2 flex-1 bg-ember/10">
-                <div className="h-full bg-ember" style={{ width: `${(d.revenue / maxDay) * 100}%` }} />
+                <div className="h-full bg-ember" style={{ width: `${(d.sales / maxDay) * 100}%` }} />
               </div>
-              <span className="w-28 text-right text-paper/70">{bwp(d.revenue)}</span>
-              <span className="w-16 text-right text-paper/40">{d.orders}x</span>
+              <span className="w-28 text-right text-paper/70">{bwp(d.sales)}</span>
+              <span className="w-14 text-right text-paper/40">{d.orders}x</span>
             </div>
           ))}
           {(data?.by_day.length ?? 0) === 0 && !isLoading && (
-            <p className="text-sm text-paper/40">No completed orders in this range.</p>
+            <p className="text-sm text-paper/40">No orders in this range.</p>
           )}
         </div>
       </section>
@@ -118,30 +123,26 @@ function LoungeReports() {
       <div className="mt-12 grid gap-10 lg:grid-cols-2">
         <Table
           title="Top items"
-          head={["Item", "Qty", "Revenue"]}
-          rows={(data?.by_item ?? []).slice(0, 12).map((i) => [i.name, String(i.qty), bwp(i.revenue)])}
+          head={["Item", "Qty", "Sales"]}
+          rows={(data?.by_item ?? []).map((i) => [i.key, String(i.qty), bwp(i.sales)])}
         />
         <Table
           title="By category"
-          head={["Category", "Qty", "Revenue"]}
-          rows={(data?.by_category ?? []).map((c) => [c.name, String(c.qty), bwp(c.revenue)])}
+          head={["Category", "Qty", "Sales"]}
+          rows={(data?.by_category ?? []).map((c) => [c.key, String(c.qty), bwp(c.sales)])}
         />
         <Table
           title="By payment method"
-          head={["Method", "Orders", "Revenue"]}
-          rows={(data?.by_payment ?? []).map((p) => [
-            PAYMENT_LABELS[p.method] ?? p.method,
-            String(p.orders),
-            bwp(p.revenue),
-          ])}
+          head={["Method", "Orders", "Sales"]}
+          rows={(data?.by_payment ?? []).map((p) => [PAYMENT_LABELS[p.key] ?? p.key, String(p.qty), bwp(p.sales)])}
         />
         <Table
-          title="Order type"
-          head={["Type", "Orders", "Revenue"]}
-          rows={(data?.by_type ?? []).map((t) => [
-            t.type === "delivery" ? "Delivery" : "Collection",
-            String(t.orders),
-            bwp(t.revenue),
+          title="Orders in range"
+          head={["Reference", "Date", "Total"]}
+          rows={(data?.orders_list ?? []).map((o) => [
+            `${o.reference} · ${o.status}`,
+            o.date,
+            bwp(o.total),
           ])}
         />
       </div>
