@@ -47,6 +47,7 @@ import { Route as AuthenticatedAdminAssistantRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminApartmentsRouteImport } from './routes/_authenticated/admin.apartments'
 import { Route as AuthenticatedAccountBookingIdRouteImport } from './routes/_authenticated/account.$bookingId'
 import { Route as AuthenticatedAdminLoungeIndexRouteImport } from './routes/_authenticated/admin.lounge.index'
+import { Route as AuthenticatedAdminLoungePromotionsRouteImport } from './routes/_authenticated/admin.lounge.promotions'
 import { Route as AuthenticatedAdminLoungeMenuRouteImport } from './routes/_authenticated/admin.lounge.menu'
 
 const WhyChooseUsRoute = WhyChooseUsRouteImport.update({
@@ -250,6 +251,12 @@ const AuthenticatedAdminLoungeIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAdminLoungeRoute,
   } as any)
+const AuthenticatedAdminLoungePromotionsRoute =
+  AuthenticatedAdminLoungePromotionsRouteImport.update({
+    id: '/promotions',
+    path: '/promotions',
+    getParentRoute: () => AuthenticatedAdminLoungeRoute,
+  } as any)
 const AuthenticatedAdminLoungeMenuRoute =
   AuthenticatedAdminLoungeMenuRouteImport.update({
     id: '/menu',
@@ -295,6 +302,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/lounge/menu': typeof AuthenticatedAdminLoungeMenuRoute
+  '/admin/lounge/promotions': typeof AuthenticatedAdminLoungePromotionsRoute
   '/admin/lounge/': typeof AuthenticatedAdminLoungeIndexRoute
 }
 export interface FileRoutesByTo {
@@ -332,6 +340,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/lounge/menu': typeof AuthenticatedAdminLoungeMenuRoute
+  '/admin/lounge/promotions': typeof AuthenticatedAdminLoungePromotionsRoute
   '/admin/lounge': typeof AuthenticatedAdminLoungeIndexRoute
 }
 export interface FileRoutesById {
@@ -374,6 +383,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/lounge/menu': typeof AuthenticatedAdminLoungeMenuRoute
+  '/_authenticated/admin/lounge/promotions': typeof AuthenticatedAdminLoungePromotionsRoute
   '/_authenticated/admin/lounge/': typeof AuthenticatedAdminLoungeIndexRoute
 }
 export interface FileRouteTypes {
@@ -416,6 +426,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/'
     | '/admin/lounge/menu'
+    | '/admin/lounge/promotions'
     | '/admin/lounge/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -453,6 +464,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin'
     | '/admin/lounge/menu'
+    | '/admin/lounge/promotions'
     | '/admin/lounge'
   id:
     | '__root__'
@@ -494,6 +506,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/lounge/menu'
+    | '/_authenticated/admin/lounge/promotions'
     | '/_authenticated/admin/lounge/'
   fileRoutesById: FileRoutesById
 }
@@ -787,6 +800,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminLoungeIndexRouteImport
       parentRoute: typeof AuthenticatedAdminLoungeRoute
     }
+    '/_authenticated/admin/lounge/promotions': {
+      id: '/_authenticated/admin/lounge/promotions'
+      path: '/promotions'
+      fullPath: '/admin/lounge/promotions'
+      preLoaderRoute: typeof AuthenticatedAdminLoungePromotionsRouteImport
+      parentRoute: typeof AuthenticatedAdminLoungeRoute
+    }
     '/_authenticated/admin/lounge/menu': {
       id: '/_authenticated/admin/lounge/menu'
       path: '/menu'
@@ -810,12 +830,15 @@ const AuthenticatedAccountRouteWithChildren =
 
 interface AuthenticatedAdminLoungeRouteChildren {
   AuthenticatedAdminLoungeMenuRoute: typeof AuthenticatedAdminLoungeMenuRoute
+  AuthenticatedAdminLoungePromotionsRoute: typeof AuthenticatedAdminLoungePromotionsRoute
   AuthenticatedAdminLoungeIndexRoute: typeof AuthenticatedAdminLoungeIndexRoute
 }
 
 const AuthenticatedAdminLoungeRouteChildren: AuthenticatedAdminLoungeRouteChildren =
   {
     AuthenticatedAdminLoungeMenuRoute: AuthenticatedAdminLoungeMenuRoute,
+    AuthenticatedAdminLoungePromotionsRoute:
+      AuthenticatedAdminLoungePromotionsRoute,
     AuthenticatedAdminLoungeIndexRoute: AuthenticatedAdminLoungeIndexRoute,
   }
 
