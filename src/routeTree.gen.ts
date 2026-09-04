@@ -37,6 +37,7 @@ import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
+import { Route as AuthenticatedAdminLoungeRouteImport } from './routes/_authenticated/admin.lounge'
 import { Route as AuthenticatedAdminHousekeepingRouteImport } from './routes/_authenticated/admin.housekeeping'
 import { Route as AuthenticatedAdminGuestsRouteImport } from './routes/_authenticated/admin.guests'
 import { Route as AuthenticatedAdminDataRequestsRouteImport } from './routes/_authenticated/admin.data-requests'
@@ -187,6 +188,12 @@ const AuthenticatedAdminReportsRoute =
     path: '/reports',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminLoungeRoute =
+  AuthenticatedAdminLoungeRouteImport.update({
+    id: '/lounge',
+    path: '/lounge',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminHousekeepingRoute =
   AuthenticatedAdminHousekeepingRouteImport.update({
     id: '/housekeeping',
@@ -269,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/admin/data-requests': typeof AuthenticatedAdminDataRequestsRoute
   '/admin/guests': typeof AuthenticatedAdminGuestsRoute
   '/admin/housekeeping': typeof AuthenticatedAdminHousekeepingRoute
+  '/admin/lounge': typeof AuthenticatedAdminLoungeRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -304,6 +312,7 @@ export interface FileRoutesByTo {
   '/admin/data-requests': typeof AuthenticatedAdminDataRequestsRoute
   '/admin/guests': typeof AuthenticatedAdminGuestsRoute
   '/admin/housekeeping': typeof AuthenticatedAdminHousekeepingRoute
+  '/admin/lounge': typeof AuthenticatedAdminLoungeRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -343,6 +352,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/data-requests': typeof AuthenticatedAdminDataRequestsRoute
   '/_authenticated/admin/guests': typeof AuthenticatedAdminGuestsRoute
   '/_authenticated/admin/housekeeping': typeof AuthenticatedAdminHousekeepingRoute
+  '/_authenticated/admin/lounge': typeof AuthenticatedAdminLoungeRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -382,6 +392,7 @@ export interface FileRouteTypes {
     | '/admin/data-requests'
     | '/admin/guests'
     | '/admin/housekeeping'
+    | '/admin/lounge'
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/'
@@ -417,6 +428,7 @@ export interface FileRouteTypes {
     | '/admin/data-requests'
     | '/admin/guests'
     | '/admin/housekeeping'
+    | '/admin/lounge'
     | '/admin/reports'
     | '/admin/settings'
     | '/admin'
@@ -455,6 +467,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/data-requests'
     | '/_authenticated/admin/guests'
     | '/_authenticated/admin/housekeeping'
+    | '/_authenticated/admin/lounge'
     | '/_authenticated/admin/reports'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/'
@@ -680,6 +693,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/lounge': {
+      id: '/_authenticated/admin/lounge'
+      path: '/lounge'
+      fullPath: '/admin/lounge'
+      preLoaderRoute: typeof AuthenticatedAdminLoungeRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/housekeeping': {
       id: '/_authenticated/admin/housekeeping'
       path: '/housekeeping'
@@ -758,6 +778,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminDataRequestsRoute: typeof AuthenticatedAdminDataRequestsRoute
   AuthenticatedAdminGuestsRoute: typeof AuthenticatedAdminGuestsRoute
   AuthenticatedAdminHousekeepingRoute: typeof AuthenticatedAdminHousekeepingRoute
+  AuthenticatedAdminLoungeRoute: typeof AuthenticatedAdminLoungeRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -771,6 +792,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminDataRequestsRoute: AuthenticatedAdminDataRequestsRoute,
   AuthenticatedAdminGuestsRoute: AuthenticatedAdminGuestsRoute,
   AuthenticatedAdminHousekeepingRoute: AuthenticatedAdminHousekeepingRoute,
+  AuthenticatedAdminLoungeRoute: AuthenticatedAdminLoungeRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
