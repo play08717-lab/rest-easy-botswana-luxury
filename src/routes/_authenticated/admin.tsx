@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 function AdminLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const tabs: Array<{ to: "/admin" | "/admin/bookings" | "/admin/calendar" | "/admin/apartments" | "/admin/guests" | "/admin/housekeeping" | "/admin/reports" | "/admin/data-requests" | "/admin/assistant" | "/admin/settings"; label: string; exact?: boolean }> = [
+  const tabs: Array<{ to: "/admin" | "/admin/bookings" | "/admin/calendar" | "/admin/apartments" | "/admin/guests" | "/admin/housekeeping" | "/admin/lounge" | "/admin/reports" | "/admin/data-requests" | "/admin/assistant" | "/admin/settings"; label: string; exact?: boolean }> = [
     { to: "/admin", label: "Dashboard", exact: true },
     { to: "/admin/calendar", label: "Calendar" },
     { to: "/admin/bookings", label: "Bookings" },
