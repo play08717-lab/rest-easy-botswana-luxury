@@ -13,6 +13,7 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { AvailabilityChecker } from "@/components/AvailabilityChecker";
 import { ExploreRakops } from "@/components/ExploreRakops";
 import { VisitorFaq } from "@/components/VisitorFaq";
+import { LoungeTeaser } from "@/components/LoungeTeaser";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -311,6 +312,7 @@ function Home() {
       </div>
 
       <ExploreRakops />
+      <LoungeTeaser />
       <VisitorFaq />
     </div>
   );
