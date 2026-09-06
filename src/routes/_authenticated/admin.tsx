@@ -23,6 +23,7 @@ function AdminLayout() {
     { to: "/admin/apartments", label: "Apartments" },
     { to: "/admin/guests", label: "Guests" },
     { to: "/admin/housekeeping", label: "Housekeeping" },
+    { to: "/admin/lounge", label: "Lounge" },
     { to: "/admin/reports", label: "Reports" },
     { to: "/admin/data-requests", label: "Data Requests" },
     { to: "/admin/assistant", label: "Concierge" },
