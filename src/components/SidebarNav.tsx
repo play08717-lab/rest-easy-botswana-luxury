@@ -43,11 +43,29 @@ export function SidebarNav() {
         </button>
       </div>
 
+      {/* Mobile backdrop */}
+      <div
+        onClick={() => setOpen(false)}
+        aria-hidden={!open}
+        className={`lg:hidden fixed inset-0 z-40 bg-dark/70 backdrop-blur-sm transition-opacity duration-300 ${
+          open ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+      />
+
       {/* Sidebar */}
       <nav
-        className={`fixed left-0 top-0 h-screen w-72 bg-dark border-r border-gold/20 flex-col justify-between py-10 z-50 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]
-          ${open ? "flex translate-x-0" : "hidden lg:flex lg:translate-x-0 -translate-x-full"}`}
+        className={`fixed left-0 top-0 h-screen w-72 max-w-[85vw] bg-dark border-r border-gold/20 flex flex-col justify-between gap-8 py-10 z-50 overflow-y-auto overscroll-contain transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]
+          lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
+        <button
+          type="button"
+          aria-label="Close menu"
+          onClick={() => setOpen(false)}
+          className="lg:hidden absolute top-5 right-5 text-paper/70 hover:text-gold transition-colors"
+        >
+          <X className="w-6 h-6" />
+        </button>
+
         <div className="px-10">
           <Link
             to="/"
