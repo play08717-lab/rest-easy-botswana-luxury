@@ -47,6 +47,7 @@ import { Route as AuthenticatedAdminAssistantRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminApartmentsRouteImport } from './routes/_authenticated/admin.apartments'
 import { Route as AuthenticatedAccountBookingIdRouteImport } from './routes/_authenticated/account.$bookingId'
 import { Route as AuthenticatedAdminLoungeIndexRouteImport } from './routes/_authenticated/admin.lounge.index'
+import { Route as AuthenticatedAdminLoungeSettingsRouteImport } from './routes/_authenticated/admin.lounge.settings'
 import { Route as AuthenticatedAdminLoungeReportsRouteImport } from './routes/_authenticated/admin.lounge.reports'
 import { Route as AuthenticatedAdminLoungePromotionsRouteImport } from './routes/_authenticated/admin.lounge.promotions'
 import { Route as AuthenticatedAdminLoungeMenuRouteImport } from './routes/_authenticated/admin.lounge.menu'
@@ -252,6 +253,12 @@ const AuthenticatedAdminLoungeIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAdminLoungeRoute,
   } as any)
+const AuthenticatedAdminLoungeSettingsRoute =
+  AuthenticatedAdminLoungeSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminLoungeRoute,
+  } as any)
 const AuthenticatedAdminLoungeReportsRoute =
   AuthenticatedAdminLoungeReportsRouteImport.update({
     id: '/reports',
@@ -311,6 +318,7 @@ export interface FileRoutesByFullPath {
   '/admin/lounge/menu': typeof AuthenticatedAdminLoungeMenuRoute
   '/admin/lounge/promotions': typeof AuthenticatedAdminLoungePromotionsRoute
   '/admin/lounge/reports': typeof AuthenticatedAdminLoungeReportsRoute
+  '/admin/lounge/settings': typeof AuthenticatedAdminLoungeSettingsRoute
   '/admin/lounge/': typeof AuthenticatedAdminLoungeIndexRoute
 }
 export interface FileRoutesByTo {
@@ -350,6 +358,7 @@ export interface FileRoutesByTo {
   '/admin/lounge/menu': typeof AuthenticatedAdminLoungeMenuRoute
   '/admin/lounge/promotions': typeof AuthenticatedAdminLoungePromotionsRoute
   '/admin/lounge/reports': typeof AuthenticatedAdminLoungeReportsRoute
+  '/admin/lounge/settings': typeof AuthenticatedAdminLoungeSettingsRoute
   '/admin/lounge': typeof AuthenticatedAdminLoungeIndexRoute
 }
 export interface FileRoutesById {
@@ -394,6 +403,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/lounge/menu': typeof AuthenticatedAdminLoungeMenuRoute
   '/_authenticated/admin/lounge/promotions': typeof AuthenticatedAdminLoungePromotionsRoute
   '/_authenticated/admin/lounge/reports': typeof AuthenticatedAdminLoungeReportsRoute
+  '/_authenticated/admin/lounge/settings': typeof AuthenticatedAdminLoungeSettingsRoute
   '/_authenticated/admin/lounge/': typeof AuthenticatedAdminLoungeIndexRoute
 }
 export interface FileRouteTypes {
@@ -438,6 +448,7 @@ export interface FileRouteTypes {
     | '/admin/lounge/menu'
     | '/admin/lounge/promotions'
     | '/admin/lounge/reports'
+    | '/admin/lounge/settings'
     | '/admin/lounge/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -477,6 +488,7 @@ export interface FileRouteTypes {
     | '/admin/lounge/menu'
     | '/admin/lounge/promotions'
     | '/admin/lounge/reports'
+    | '/admin/lounge/settings'
     | '/admin/lounge'
   id:
     | '__root__'
@@ -520,6 +532,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/lounge/menu'
     | '/_authenticated/admin/lounge/promotions'
     | '/_authenticated/admin/lounge/reports'
+    | '/_authenticated/admin/lounge/settings'
     | '/_authenticated/admin/lounge/'
   fileRoutesById: FileRoutesById
 }
@@ -813,6 +826,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminLoungeIndexRouteImport
       parentRoute: typeof AuthenticatedAdminLoungeRoute
     }
+    '/_authenticated/admin/lounge/settings': {
+      id: '/_authenticated/admin/lounge/settings'
+      path: '/settings'
+      fullPath: '/admin/lounge/settings'
+      preLoaderRoute: typeof AuthenticatedAdminLoungeSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminLoungeRoute
+    }
     '/_authenticated/admin/lounge/reports': {
       id: '/_authenticated/admin/lounge/reports'
       path: '/reports'
@@ -852,6 +872,7 @@ interface AuthenticatedAdminLoungeRouteChildren {
   AuthenticatedAdminLoungeMenuRoute: typeof AuthenticatedAdminLoungeMenuRoute
   AuthenticatedAdminLoungePromotionsRoute: typeof AuthenticatedAdminLoungePromotionsRoute
   AuthenticatedAdminLoungeReportsRoute: typeof AuthenticatedAdminLoungeReportsRoute
+  AuthenticatedAdminLoungeSettingsRoute: typeof AuthenticatedAdminLoungeSettingsRoute
   AuthenticatedAdminLoungeIndexRoute: typeof AuthenticatedAdminLoungeIndexRoute
 }
 
@@ -861,6 +882,8 @@ const AuthenticatedAdminLoungeRouteChildren: AuthenticatedAdminLoungeRouteChildr
     AuthenticatedAdminLoungePromotionsRoute:
       AuthenticatedAdminLoungePromotionsRoute,
     AuthenticatedAdminLoungeReportsRoute: AuthenticatedAdminLoungeReportsRoute,
+    AuthenticatedAdminLoungeSettingsRoute:
+      AuthenticatedAdminLoungeSettingsRoute,
     AuthenticatedAdminLoungeIndexRoute: AuthenticatedAdminLoungeIndexRoute,
   }
 
