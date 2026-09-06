@@ -13,6 +13,7 @@ const links = [
   { to: "/gallery", label: "Gallery" },
   { to: "/nearby", label: "Nearby" },
   { to: "/faq", label: "FAQ" },
+  { to: "/lounge", label: "Engliton Lounge" },
   { to: "/contact", label: "Contact" },
   { to: "/book", label: "Book Now" },
 ] as const;
