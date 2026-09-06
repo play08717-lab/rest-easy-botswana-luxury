@@ -171,7 +171,8 @@ function LoungeHome() {
             <h3 className="font-display text-xl">{c.name}</h3>
             {c.description && <p className="mt-2 text-xs leading-relaxed text-paper/55">{c.description}</p>}
             <span className="mt-4 block text-[10px] uppercase tracking-[0.25em] text-ember">
-              {items.filter((i) => i.category_id === c.id).length} dishes →
+              {items.filter((i) => i.category_id === c.id).length}{" "}
+              {items.filter((i) => i.category_id === c.id).length === 1 ? "dish" : "dishes"} →
             </span>
           </Link>
         ))}
